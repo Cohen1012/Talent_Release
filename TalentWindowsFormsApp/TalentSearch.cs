@@ -1,0 +1,295 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using TalentClassLibrary;
+using ShareClassLibrary;
+
+namespace TalentWindowsFormsApp
+{
+    public partial class TalentSearch : Form
+    {
+        public TalentSearch()
+        {
+            InitializeComponent();
+        }
+
+        private void TalentSearch_Load(object sender, EventArgs e)
+        {
+            CooperationCombo.SelectedItem = "不限";
+            ContactStatusCombo.SelectedItem = "不限";
+            IsInterviewCombo.SelectedItem = "不限";
+            InterviewResultCombo.SelectedItem = "不限";
+            ExportCombo.SelectedItem = "聯繫狀況";
+        }
+
+        private void SearchBtn_Click(object sender, EventArgs e)
+        {
+            string keyword = KeyWordTxt.Text;
+            string skills = SkillsTxt.Text;
+            string place = PlaceTxt.Text;
+            string cooperationMode = CooperationCombo.SelectedItem.ToString();
+            string contactStatus = ContactStatusCombo.SelectedText.ToString();
+            string startEditDate = StartEditDateTxt.Text;
+            string endEditDate = EndEditDateTxt.Text;
+            string isInterview = IsInterviewCombo.SelectedItem.ToString();
+            string interviewResult = InterviewResultCombo.SelectedItem.ToString();
+            string startInterviewDate = StartInterviewDateTxt.Text;
+            string EndInterviewDate = EndInterviewDateTxt.Text;
+            ////從資料庫撈出符合條件的聯繫ID
+            //DataTable dataTable = TalentClassLibrary.TalentSearch.GetInstance().SelectIdByFilter(keyword, place, skills, cooperationMode, contactStatus, startEditDate, endEditDate, isInterview, interviewResult, startInterviewDate, EndInterviewDate);
+            //TalentClassLibrary.TalentSearch.GetInstance().CombinationGrid(dataTable);
+            //return;
+
+            List<string> contactIdList = Talent.GetInstance().SelectIdByFilter(keyword, place, skills, cooperationMode, contactStatus, startEditDate, endEditDate, isInterview, interviewResult, startInterviewDate, EndInterviewDate);
+            dataGridView1.Columns.Clear();
+            if (contactIdList.Count == 0)
+            {
+                MessageBox.Show("沒有符合的資料", "訊息");
+                return;
+            }
+            DataTable dt = new DataTable();
+            dt = Talent.GetInstance().SelectTalentInfoById(contactIdList);
+            if (dt.Rows.Count == 0)
+            {
+                MessageBox.Show("發生錯誤", "錯誤訊息");
+                return;
+            }
+            dt.Columns.Add("UpdateTalent");
+            dt.Columns.Add("DelTalent");
+            foreach (DataRow dr in dt.Rows)
+            {
+                if (!string.IsNullOrEmpty(dr["Contact_Id"].ToString()))
+                {
+                    dr["UpdateTalent"] = "修改";
+                    dr["DelTalent"] = "刪除";
+                }
+            }
+
+            ////開始產生Grid
+            dataGridView1.AutoGenerateColumns = false;
+            dataGridView1.DataSource = dt;
+
+            ////隱藏欄位聯繫ID
+            DataGridViewTextBoxColumn contact_Id = new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Contact_Id",
+                Name = "聯繫ID"
+            };
+            dataGridView1.Columns.Add(contact_Id);
+            ////姓名
+            DataGridViewTextBoxColumn name = new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Name",
+                Name = "姓名",
+                SortMode = DataGridViewColumnSortMode.NotSortable
+            };
+            dataGridView1.Columns.Add(name);
+            ////代碼
+            DataGridViewTextBoxColumn code = new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Code_Id",
+                Name = "代碼",
+                SortMode = DataGridViewColumnSortMode.NotSortable
+            };
+            dataGridView1.Columns.Add(code);
+            ////聯繫日期
+            DataGridViewTextBoxColumn contact_Date = new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Contact_Date",
+                Name = "聯繫日期",
+                SortMode = DataGridViewColumnSortMode.NotSortable
+            };
+            dataGridView1.Columns.Add(contact_Date);
+            ////聯繫狀況
+            DataGridViewTextBoxColumn contact_Status = new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Contact_Status",
+                Name = "聯繫狀況",
+                SortMode = DataGridViewColumnSortMode.NotSortable
+            };
+            dataGridView1.Columns.Add(contact_Status);
+            ////備註
+            DataGridViewTextBoxColumn remarks = new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Remarks",
+                Name = "備註",
+                Width = 690,
+                SortMode = DataGridViewColumnSortMode.NotSortable
+            };
+            dataGridView1.Columns.Add(remarks);
+            ////面試時間
+            DataGridViewTextBoxColumn interview_Date = new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Interview_Date",
+                Name = "面試時間",
+                SortMode = DataGridViewColumnSortMode.NotSortable
+            };
+            dataGridView1.Columns.Add(interview_Date);
+            ////最編輯時間
+            DataGridViewTextBoxColumn updateTime = new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "UpdateTime",
+                Name = "最編輯時間",
+                SortMode = DataGridViewColumnSortMode.NotSortable
+            };
+            dataGridView1.Columns.Add(updateTime);
+            ////編輯按鈕
+            DataGridViewLinkColumn UpdateAccount = new DataGridViewLinkColumn
+            {
+                DataPropertyName = "UpdateTalent",
+                Name = "",
+                Width = 50
+
+            };
+            dataGridView1.Columns.Add(UpdateAccount);
+            ////編輯按鈕
+            DataGridViewLinkColumn DelAccount = new DataGridViewLinkColumn
+            {
+                DataPropertyName = "DelTalent",
+                Name = "",
+                Width = 50
+
+            };
+            dataGridView1.Columns.Add(DelAccount);
+            dataGridView1.Columns[0].Visible = false;
+        }
+
+        private void CalendarBtn_Click(object sender, EventArgs e)
+        {
+            Button btn = (Button)sender;
+            CalendarForm calendarForm = new CalendarForm();
+            calendarForm.ShowDialog();
+            if (calendarForm.DialogResult == DialogResult.OK)
+            {
+                if (btn.Name == "CalendarBtn")
+                {
+                    StartEditDateTxt.Text = calendarForm.CalenderValue;
+                }
+
+                if (btn.Name == "CalendarBtn1")
+                {
+                    EndEditDateTxt.Text = calendarForm.CalenderValue;
+                }
+
+                if (btn.Name == "CalendarBtn2")
+                {
+                    StartInterviewDateTxt.Text = calendarForm.CalenderValue;
+                }
+
+                if (btn.Name == "CalendarBtn3")
+                {
+                    EndInterviewDateTxt.Text = calendarForm.CalenderValue;
+                }
+
+                calendarForm.Close();
+            }
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0)
+            {
+                return;
+            }
+
+            ////修改
+            if (dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString() == "修改")
+            {
+                ContactStatus contactStatus = new ContactStatus(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString())
+                {
+                    MdiParent = this.MdiParent
+                };
+                contactStatus.Show();
+                this.Close();
+                return;
+            }
+
+            ////刪除
+            if (dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString() == "刪除")
+            {
+                DialogResult result = MessageBox.Show("是否刪除選取的資料", "警告", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (result == DialogResult.Yes)
+                {
+                    string msg = Talent.GetInstance().DelTalentById(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString());
+                    if (msg == "刪除成功")
+                    {
+                        MessageBox.Show(msg, "訊息");
+                        dataGridView1.Rows.RemoveAt(e.RowIndex);
+                    }
+                    else
+                    {
+                        MessageBox.Show(msg, "錯誤訊息");
+                    }
+                }
+            }
+        }
+
+        private void ExportLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            string path = string.Empty;
+            string msg = string.Empty;
+            string exportMode = ExportCombo.SelectedItem.ToString();
+            DataTable dt = dataGridView1.DataSource as DataTable;
+            if (dataGridView1.Rows.Count == 0)
+            {
+                MessageBox.Show("沒有資料", "錯誤訊息");
+                return;
+            }
+
+            SaveFileDialog sfd = new SaveFileDialog
+            {
+                Title = "請選擇存檔的路徑",
+                FileName = "Excel",
+                Filter = @"Excel|*.xlsx"
+            };
+
+            if (sfd.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
+            }
+            else
+            {
+                path = Path.GetDirectoryName(sfd.FileName);
+            }
+
+            var idList = (from row in dt.AsEnumerable()
+                          where !string.IsNullOrEmpty(row.Field<string>("Contact_Id"))
+                          select row.Field<string>("Contact_Id")).ToList();
+            switch (exportMode)
+            {
+                case "聯繫狀況":
+                    msg = Talent.GetInstance().ExportContactSituationDataByContactId(idList,path);
+                    break;
+                case "面談資料":
+                    msg = Talent.GetInstance().ExportInterviewDataByContactId(idList, path);
+                    break;
+                case "所有資料":
+                    msg = Talent.GetInstance().ExportAllDataByContactId(idList, path);
+                    break;
+                default:
+                    msg = "沒有匯出任何資料";
+                    break;
+            }
+
+            MessageBox.Show(msg,"訊息");
+
+        }
+
+        private void InsertContactBtn_Click(object sender, EventArgs e)
+        {
+            ContactStatus contactStatus = new ContactStatus
+            {
+                MdiParent = this.MdiParent
+            };
+            contactStatus.Show();
+            this.Close();
+        }
+    }
+}
