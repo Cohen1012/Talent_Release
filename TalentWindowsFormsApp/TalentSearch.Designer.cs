@@ -34,9 +34,13 @@
             this.ImportLink = new System.Windows.Forms.LinkLabel();
             this.ExportCombo = new System.Windows.Forms.ComboBox();
             this.ExportLink = new System.Windows.Forms.LinkLabel();
+            this.CalendarBtn3 = new System.Windows.Forms.Button();
             this.EndInterviewDateTxt = new System.Windows.Forms.TextBox();
+            this.CalendarBtn2 = new System.Windows.Forms.Button();
             this.StartInterviewDateTxt = new System.Windows.Forms.TextBox();
+            this.CalendarBtn1 = new System.Windows.Forms.Button();
             this.EndEditDateTxt = new System.Windows.Forms.TextBox();
+            this.CalendarBtn = new System.Windows.Forms.Button();
             this.StartEditDateTxt = new System.Windows.Forms.TextBox();
             this.InsertContactBtn = new System.Windows.Forms.Button();
             this.SearchBtn = new System.Windows.Forms.Button();
@@ -59,10 +63,6 @@
             this.KeyWordTxt = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.CalendarBtn3 = new System.Windows.Forms.Button();
-            this.CalendarBtn2 = new System.Windows.Forms.Button();
-            this.CalendarBtn1 = new System.Windows.Forms.Button();
-            this.CalendarBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -149,6 +149,7 @@
             this.ImportLink.TabIndex = 30;
             this.ImportLink.TabStop = true;
             this.ImportLink.Text = "匯入";
+            this.ImportLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ImportLink_LinkClicked);
             // 
             // ExportCombo
             // 
@@ -174,12 +175,32 @@
             this.ExportLink.Text = "匯出";
             this.ExportLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ExportLink_LinkClicked);
             // 
+            // CalendarBtn3
+            // 
+            this.CalendarBtn3.Image = global::TalentWindowsFormsApp.Properties.Resources.Calendar;
+            this.CalendarBtn3.Location = new System.Drawing.Point(716, 77);
+            this.CalendarBtn3.Name = "CalendarBtn3";
+            this.CalendarBtn3.Size = new System.Drawing.Size(30, 30);
+            this.CalendarBtn3.TabIndex = 36;
+            this.CalendarBtn3.UseVisualStyleBackColor = true;
+            this.CalendarBtn3.Click += new System.EventHandler(this.CalendarBtn_Click);
+            // 
             // EndInterviewDateTxt
             // 
             this.EndInterviewDateTxt.Location = new System.Drawing.Point(589, 81);
             this.EndInterviewDateTxt.Name = "EndInterviewDateTxt";
             this.EndInterviewDateTxt.Size = new System.Drawing.Size(121, 23);
             this.EndInterviewDateTxt.TabIndex = 35;
+            // 
+            // CalendarBtn2
+            // 
+            this.CalendarBtn2.Image = global::TalentWindowsFormsApp.Properties.Resources.Calendar;
+            this.CalendarBtn2.Location = new System.Drawing.Point(533, 77);
+            this.CalendarBtn2.Name = "CalendarBtn2";
+            this.CalendarBtn2.Size = new System.Drawing.Size(30, 30);
+            this.CalendarBtn2.TabIndex = 34;
+            this.CalendarBtn2.UseVisualStyleBackColor = true;
+            this.CalendarBtn2.Click += new System.EventHandler(this.CalendarBtn_Click);
             // 
             // StartInterviewDateTxt
             // 
@@ -188,12 +209,32 @@
             this.StartInterviewDateTxt.Size = new System.Drawing.Size(121, 23);
             this.StartInterviewDateTxt.TabIndex = 33;
             // 
+            // CalendarBtn1
+            // 
+            this.CalendarBtn1.Image = global::TalentWindowsFormsApp.Properties.Resources.Calendar;
+            this.CalendarBtn1.Location = new System.Drawing.Point(454, 178);
+            this.CalendarBtn1.Name = "CalendarBtn1";
+            this.CalendarBtn1.Size = new System.Drawing.Size(30, 30);
+            this.CalendarBtn1.TabIndex = 32;
+            this.CalendarBtn1.UseVisualStyleBackColor = true;
+            this.CalendarBtn1.Click += new System.EventHandler(this.CalendarBtn_Click);
+            // 
             // EndEditDateTxt
             // 
             this.EndEditDateTxt.Location = new System.Drawing.Point(327, 183);
             this.EndEditDateTxt.Name = "EndEditDateTxt";
             this.EndEditDateTxt.Size = new System.Drawing.Size(121, 23);
             this.EndEditDateTxt.TabIndex = 31;
+            // 
+            // CalendarBtn
+            // 
+            this.CalendarBtn.Image = global::TalentWindowsFormsApp.Properties.Resources.Calendar;
+            this.CalendarBtn.Location = new System.Drawing.Point(267, 178);
+            this.CalendarBtn.Name = "CalendarBtn";
+            this.CalendarBtn.Size = new System.Drawing.Size(30, 30);
+            this.CalendarBtn.TabIndex = 30;
+            this.CalendarBtn.UseVisualStyleBackColor = true;
+            this.CalendarBtn.Click += new System.EventHandler(this.CalendarBtn_Click);
             // 
             // StartEditDateTxt
             // 
@@ -434,46 +475,6 @@
             this.dataGridView1.Size = new System.Drawing.Size(807, 292);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
-            // 
-            // CalendarBtn3
-            // 
-            this.CalendarBtn3.Image = global::TalentWindowsFormsApp.Properties.Resources.Calendar;
-            this.CalendarBtn3.Location = new System.Drawing.Point(716, 77);
-            this.CalendarBtn3.Name = "CalendarBtn3";
-            this.CalendarBtn3.Size = new System.Drawing.Size(30, 30);
-            this.CalendarBtn3.TabIndex = 36;
-            this.CalendarBtn3.UseVisualStyleBackColor = true;
-            this.CalendarBtn3.Click += new System.EventHandler(this.CalendarBtn_Click);
-            // 
-            // CalendarBtn2
-            // 
-            this.CalendarBtn2.Image = global::TalentWindowsFormsApp.Properties.Resources.Calendar;
-            this.CalendarBtn2.Location = new System.Drawing.Point(533, 77);
-            this.CalendarBtn2.Name = "CalendarBtn2";
-            this.CalendarBtn2.Size = new System.Drawing.Size(30, 30);
-            this.CalendarBtn2.TabIndex = 34;
-            this.CalendarBtn2.UseVisualStyleBackColor = true;
-            this.CalendarBtn2.Click += new System.EventHandler(this.CalendarBtn_Click);
-            // 
-            // CalendarBtn1
-            // 
-            this.CalendarBtn1.Image = global::TalentWindowsFormsApp.Properties.Resources.Calendar;
-            this.CalendarBtn1.Location = new System.Drawing.Point(454, 178);
-            this.CalendarBtn1.Name = "CalendarBtn1";
-            this.CalendarBtn1.Size = new System.Drawing.Size(30, 30);
-            this.CalendarBtn1.TabIndex = 32;
-            this.CalendarBtn1.UseVisualStyleBackColor = true;
-            this.CalendarBtn1.Click += new System.EventHandler(this.CalendarBtn_Click);
-            // 
-            // CalendarBtn
-            // 
-            this.CalendarBtn.Image = global::TalentWindowsFormsApp.Properties.Resources.Calendar;
-            this.CalendarBtn.Location = new System.Drawing.Point(267, 178);
-            this.CalendarBtn.Name = "CalendarBtn";
-            this.CalendarBtn.Size = new System.Drawing.Size(30, 30);
-            this.CalendarBtn.TabIndex = 30;
-            this.CalendarBtn.UseVisualStyleBackColor = true;
-            this.CalendarBtn.Click += new System.EventHandler(this.CalendarBtn_Click);
             // 
             // TalentSearch
             // 

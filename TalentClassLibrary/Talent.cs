@@ -1023,9 +1023,9 @@ namespace TalentClassLibrary
         public string InsertContactSituationInfoData(DataTable inData)
         {
             string contact_Id = string.Empty;
-            string insert = @"insert into Contact_Info ([Name],[Sex],[Mail],[CellPhone],[UpdateTime],[Cooperation_Mode],[Status],[Place],[Skill])
+            string insert = @"insert into Contact_Info ([Name],[Sex],[Mail],[CellPhone],[UpdateTime],[Cooperation_Mode],[Status],[Place],[Skill],[Year])
                               output inserted.Contact_Id
-                              values(@name,@sex,@mail,@cellPhone,@updateTime,@cooperationMode,@status,@place,@skill)";
+                              values(@name,@sex,@mail,@cellPhone,@updateTime,@cooperationMode,@status,@place,@skill,@year)";
             try
             {
                 using (SqlCommand cmd = new SqlCommand(insert, ScConnection, StTransaction))
@@ -1034,14 +1034,15 @@ namespace TalentClassLibrary
                     {
                         cmd.Parameters.Clear();
                         cmd.Parameters.Add("@name", SqlDbType.NVarChar).Value = dr["Name"].ToString();
-                        cmd.Parameters.Add("@sex", SqlDbType.NChar).Value = dr["Sex"].ToString();
+                        cmd.Parameters.Add("@sex", SqlDbType.NVarChar).Value = dr["Sex"].ToString();
                         cmd.Parameters.Add("@mail", SqlDbType.VarChar).Value = dr["Mail"].ToString();
                         cmd.Parameters.Add("@cellPhone", SqlDbType.Char).Value = dr["CellPhone"].ToString();
                         cmd.Parameters.Add("@updateTime", SqlDbType.DateTime).Value = DateTime.Now.ToString();
-                        cmd.Parameters.Add("@cooperationMode", SqlDbType.NChar).Value = dr["Cooperation_Mode"].ToString();
-                        cmd.Parameters.Add("@status", SqlDbType.NChar).Value = dr["Status"].ToString();
+                        cmd.Parameters.Add("@cooperationMode", SqlDbType.NVarChar).Value = dr["Cooperation_Mode"].ToString();
+                        cmd.Parameters.Add("@status", SqlDbType.NVarChar).Value = dr["Status"].ToString();
                         cmd.Parameters.Add("@place", SqlDbType.NVarChar).Value = dr["Place"].ToString();
                         cmd.Parameters.Add("@skill", SqlDbType.NVarChar).Value = dr["Skill"].ToString();
+                        cmd.Parameters.Add("@year", SqlDbType.VarChar).Value = dr["Year"].ToString();
                         contact_Id = cmd.ExecuteScalar().ToString();
                     }
 
@@ -1792,7 +1793,7 @@ namespace TalentClassLibrary
                     List<InterviewData> interviewDataList = new List<InterviewData>(); ///面談資料清單
                     ContactSituation contactSituation = new ContactSituation();
                     DataSet ds = this.SelectContactSituationDataById(contactIdList[i]);
-                    contactSituation.Info = ds.Tables[0].DataTableToList<ContactInfo>()[0];
+                    contactSituation.Info = ds.Tables[0].DBNullToEmpty().DataTableToList<ContactInfo>()[0];
                     contactSituation.Status = ds.Tables[1].DataTableToList<ContactStatus>();
                     string codeList = string.Empty;
                     foreach (DataRow dr in ds.Tables[2].Rows)
@@ -1926,7 +1927,7 @@ namespace TalentClassLibrary
                 {
                     ContactSituation contactSituation = new ContactSituation();
                     DataSet ds = this.SelectContactSituationDataById(contactId);
-                    contactSituation.Info = ds.Tables[0].DataTableToList<ContactInfo>()[0];
+                    contactSituation.Info = ds.Tables[0].DBNullToEmpty().DataTableToList<ContactInfo>()[0];
                     contactSituation.Status = ds.Tables[1].DataTableToList<ContactStatus>();
                     string codeList = string.Empty;
                     foreach (DataRow dr in ds.Tables[2].Rows)
@@ -2212,7 +2213,7 @@ namespace TalentClassLibrary
             }
 
             string update = @"update Contact_Info set Name=@name,Sex=@sex,Mail=@mail,CellPhone=@cellPhone,UpdateTime=@updateTime,
-                                                      Cooperation_Mode=@cooperationMode,Status=@status,Place=@place,Skill=@skill
+                                                      Cooperation_Mode=@cooperationMode,Status=@status,Place=@place,Skill=@skill,Year=@year
                               where Contact_Id=@id";
             try
             {
@@ -2222,14 +2223,15 @@ namespace TalentClassLibrary
                     {
                         cmd.Parameters.Clear();
                         cmd.Parameters.Add("@name", SqlDbType.NVarChar).Value = dr["Name"].ToString();
-                        cmd.Parameters.Add("@sex", SqlDbType.NChar).Value = dr["Sex"].ToString();
+                        cmd.Parameters.Add("@sex", SqlDbType.NVarChar).Value = dr["Sex"].ToString();
                         cmd.Parameters.Add("@mail", SqlDbType.VarChar).Value = dr["Mail"].ToString();
-                        cmd.Parameters.Add("@cellPhone", SqlDbType.Char).Value = dr["CellPhone"].ToString();
+                        cmd.Parameters.Add("@cellPhone", SqlDbType.VarChar).Value = dr["CellPhone"].ToString();
                         cmd.Parameters.Add("@updateTime", SqlDbType.DateTime).Value = DateTime.Now.ToString();
                         cmd.Parameters.Add("@cooperationMode", SqlDbType.NChar).Value = dr["Cooperation_Mode"].ToString();
-                        cmd.Parameters.Add("@status", SqlDbType.NChar).Value = dr["Status"].ToString();
+                        cmd.Parameters.Add("@status", SqlDbType.NVarChar).Value = dr["Status"].ToString();
                         cmd.Parameters.Add("@place", SqlDbType.NVarChar).Value = dr["Place"].ToString();
                         cmd.Parameters.Add("@skill", SqlDbType.NVarChar).Value = dr["Skill"].ToString();
+                        cmd.Parameters.Add("@year", SqlDbType.VarChar).Value = dr["Year"].ToString();
                         cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
                         cmd.ExecuteNonQuery();
                     }

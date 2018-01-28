@@ -518,6 +518,7 @@ namespace TalentWindowsFormsApp
             ContactInfoUI.Columns.Add("Status");
             ContactInfoUI.Columns.Add("Place");
             ContactInfoUI.Columns.Add("Skill");
+            ContactInfoUI.Columns.Add("Year");
         }
 
         /// <summary>
@@ -550,7 +551,8 @@ namespace TalentWindowsFormsApp
             string skill = SkillTxt.Text.Trim();
             string sex = (SexCombo.SelectedItem.ToString() == "--請選擇--") ? string.Empty : SexCombo.SelectedItem.ToString();
             string status = (StatusCombo.SelectedItem.ToString() == "--請選擇--") ? string.Empty : StatusCombo.SelectedItem.ToString();
-            ContactInfoUI.Rows.Add(name, sex, mail, phone, cooperationMode, status, place, skill);
+            string year = YearTxt.Text;
+            ContactInfoUI.Rows.Add(name, sex, mail, phone, cooperationMode, status, place, skill,year);
             ////代碼資料
             DataTable codeList = new DataTable();
             codeList.Columns.Add("Code_Id");
@@ -720,7 +722,8 @@ namespace TalentWindowsFormsApp
                 Place = PlaceTxt.Text.Trim(),
                 Skill = SkillTxt.Text.Trim(),
                 Sex = (SexCombo.SelectedItem.ToString() == "--請選擇--") ? string.Empty : SexCombo.SelectedItem.ToString().Trim(),
-                Status = (StatusCombo.SelectedItem.ToString() == "--請選擇--") ? string.Empty : StatusCombo.SelectedItem.ToString().Trim()
+                Status = (StatusCombo.SelectedItem.ToString() == "--請選擇--") ? string.Empty : StatusCombo.SelectedItem.ToString().Trim(),
+                Year = YearTxt.Text
             };
             ////DB聯繫基本資料
             List<ContactInfo> infoDB = ContactInfoDB.DataTableToList<ContactInfo>();
@@ -733,7 +736,8 @@ namespace TalentWindowsFormsApp
                                       DB.Place.Trim() == infoUI.Place &&
                                       DB.Skill.Trim() == infoUI.Skill &&
                                       DB.Sex.Trim() == infoUI.Sex &&
-                                      DB.Status.Trim() == infoUI.Status
+                                      DB.Status.Trim() == infoUI.Status &&
+                                      DB.Year.Trim() == infoUI.Year
                                 select DB).ToList();
             ////UI代碼資料
             List<string> codeUIList = new List<string>();
@@ -789,6 +793,7 @@ namespace TalentWindowsFormsApp
                 SkillTxt.Text = string.Empty;
                 SexCombo.SelectedItem = "--請選擇--";
                 StatusCombo.SelectedItem = "--請選擇--";
+                YearTxt.Text = string.Empty;
                 ////清空代碼資料
                 for (int i = 0; i < CodeTxt.Count; i++)
                 {

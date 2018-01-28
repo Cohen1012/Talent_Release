@@ -746,6 +746,7 @@ namespace TalentClassLibrary
 
             sheet.Range["J2"].Text = ContactSituationList[i].Info.Place;
             sheet.Range["J4"].Text = ContactSituationList[i].Info.Skill;
+            sheet.Range["J6"].Text = ContactSituationList[i].Info.Year;
             sheet.Range["J8"].Text = ContactSituationList[i].Info.Cooperation_Mode;
             sheet.Range["J10"].Text = ContactSituationList[i].Info.Status;
 

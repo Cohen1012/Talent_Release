@@ -291,5 +291,21 @@ namespace TalentWindowsFormsApp
             contactStatus.Show();
             this.Close();
         }
+
+        private void ImportLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog
+            {
+                Title = "請選擇上傳的聯繫狀況Excel",
+                Filter = @"Excel Files|*.xlsx",
+                Multiselect = false,
+                RestoreDirectory = true
+            };
+
+            if(ofd.ShowDialog() == DialogResult.OK)
+            {
+
+            }
+        }
     }
 }
