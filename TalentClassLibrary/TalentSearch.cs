@@ -19,6 +19,11 @@ namespace TalentClassLibrary
         public static TalentSearch GetInstance() => talentSearch;
 
         /// <summary>
+        /// 紀錄目前發生
+        /// </summary>
+        public string ErrorMessage { get; set; }
+
+        /// <summary>
         /// 根據條件查詢符合的資料
         /// </summary>
         /// <param name="keyWords">關鍵字，如有多個關鍵字請用","隔開</param>
@@ -188,13 +193,13 @@ namespace TalentClassLibrary
                 searchResult.Name = (from row in dt.AsEnumerable() where row.Field<int?>("Contact_Id") == idList[i] select row.Field<string>("Name")).Distinct().First();
                 searchResult.Code = (from row in dt.AsEnumerable() where row.Field<int?>("Contact_Id") == idList[i] select row.Field<string>("Code_Id")).Distinct().ToList();
                 var Status = (from row in dt.AsEnumerable()
-                                       where row.Field<int>("Contact_Id") == idList[i]
-                                       select new
-                                       {
-                                           Contact_Date = row.Field<DateTime?>("Contact_Date"),
-                                           Contact_Status = row.Field<string>("Contact_Status"),
-                                           Remarks = row.Field<string>("Remarks")
-                                       }
+                              where row.Field<int>("Contact_Id") == idList[i]
+                              select new
+                              {
+                                  Contact_Date = row.Field<DateTime?>("Contact_Date"),
+                                  Contact_Status = row.Field<string>("Contact_Status"),
+                                  Remarks = row.Field<string>("Remarks")
+                              }
                                        ).Distinct().ToList();
                 searchResult.Interview_Date = (from row in dt.AsEnumerable() where row.Field<int?>("Contact_Id") == idList[i] select row.Field<DateTime?>("Interview_Date").ToString()).Distinct().ToList();
                 searchResult.UpdateTime = (from row in dt.AsEnumerable() where row.Field<int?>("Contact_Id") == idList[i] select row.Field<string>("UpdateTime")).Distinct().First();

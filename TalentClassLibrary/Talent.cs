@@ -24,6 +24,11 @@ namespace TalentClassLibrary
         public static Talent GetInstance() => talent;
 
         /// <summary>
+        /// 紀錄大略發生的錯誤
+        /// </summary>
+        public string ErrorMessage { get; set; }
+
+        /// <summary>
         /// 寄送重製密碼的信件
         /// </summary>
         /// <param name="account">欲提醒更換密碼的信箱</param>
@@ -54,6 +59,8 @@ namespace TalentClassLibrary
         /// <returns></returns>
         public string DelInterviewDataByInterviewId(string interviewId)
         {
+            ErrorMessage = string.Empty;
+
             if (!this.ValidInterviewIdIsAppear(interviewId))
             {
                 return "此面談資料不存在";
@@ -72,7 +79,6 @@ namespace TalentClassLibrary
             string sqlStr = string.Empty;
             try
             {
-
                 using (SqlCommand cmd = new SqlCommand(sqlStr, ScConnection, StTransaction))
                 {
                     ////更新最後修改時間
@@ -102,6 +108,8 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
+                ErrorMessage = "資料庫發生錯誤";
                 this.RollbackTransaction();
                 return "刪除失敗";
             }
