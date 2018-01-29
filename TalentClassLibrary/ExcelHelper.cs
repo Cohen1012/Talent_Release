@@ -4,15 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Spire.Xls;
-using System.Windows.Forms;
 using System.IO;
 using TalentClassLibrary.Model;
 using ServiceStack.Text;
 using ServiceStack;
 using Spire.Xls.Core;
+using System.Data;
+using ShareClassLibrary;
 
 namespace TalentClassLibrary
 {
+    /// <summary>
+    /// 處理Excel的類別
+    /// </summary>
     public class ExcelHelper
     {
         private static ExcelHelper excelHelper = new ExcelHelper();
@@ -63,6 +67,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 return "匯出失敗";
             }
         }
@@ -113,6 +118,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 return "匯出失敗";
             }
         }
@@ -167,7 +173,134 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 return "匯出失敗";
+            }
+        }
+
+        public void ImportOldTalent(string path)
+        {
+            List<ContactSituation> contactSituationList = new List<ContactSituation>();
+            try
+            {
+                Workbook workbook = new Workbook();
+                workbook.LoadFromFile(path);
+                Worksheet sheet = workbook.Worksheets[0];
+                DataTable dt = sheet.ExportDataTable();
+
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    ContactSituation contactSituation = new ContactSituation();
+                    ContactInfo contactInfo = new ContactInfo();
+                    ContactStatus contactStatus = new ContactStatus();
+                    ////先不處理聯繫狀況
+                    for (int j = 0; j < 29; j++)
+                    {
+                        if(j==3 || j==4 || j== 5)
+                        {
+                            continue;
+                        }
+
+                        switch (dt.Columns[j].ToString())
+                        {
+                            case "姓名":
+                                contactInfo.Name = dt.Rows[i].ItemArray[j].ToString();
+                                break;
+                            case "地點":
+                                contactInfo.Place = dt.Rows[i].ItemArray[j].ToString();
+                                break;
+                            case "1111/104代碼":
+                                contactSituation.Code = dt.Rows[i].ItemArray[j].ToString();
+                                break;
+                            case "JAVA":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "JSP":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "Android APP":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "ASP":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "C/C++":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "C#":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "ASP.NET":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "VB.NET":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "VB6":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "HTML":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "Javascript":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "Bootstrap":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "Delphi":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "PHP":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "研替":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "Hadoop":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "ETL":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "R":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "notes":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "UI/UX":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "資料庫":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                            case "Linux":
+                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
+                                break;
+                        }
+                        for (int z = 3; z <= 5; z++)
+                        {
+                            switch (dt.Columns[j].ToString())
+                            {
+                                case "日期":
+                                    if(valid)
+                                    contactStatus.Contact_Date = dt.Rows[i].ItemArray[j].ToString();
+                                    break;
+                                case "聯絡狀況":
+                                    contactStatus.Contact_Status = dt.Rows[i].ItemArray[j].ToString();
+                                    break;
+                                case "說明":
+                                    contactStatus.Remarks = dt.Rows[i].ItemArray[j].ToString();
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogInfo.WriteErrorInfo(ex);
             }
         }
 
@@ -199,7 +332,7 @@ namespace TalentClassLibrary
             sheet.Range["I4"].Text = interviewInfo.Sex;
             sheet.Range["I6"].Text = interviewInfo.Mail;
             sheet.Range["I10"].Text = interviewInfo.Urgent_Relationship;
-            sheet.Range["L4"].Text = string.IsNullOrEmpty(interviewInfo.Birthday)? string.Empty: interviewInfo.Birthday;
+            sheet.Range["L4"].Text = string.IsNullOrEmpty(interviewInfo.Birthday) ? string.Empty : interviewInfo.Birthday;
             sheet.Range["L6"].Text = interviewInfo.CellPhone;
             sheet.Range["L10"].Text = interviewInfo.Urgent_CellPhone;
             ////學歷
@@ -691,7 +824,7 @@ namespace TalentClassLibrary
             }
             ////面談評語
             List<InterviewComments> interviewCommentsList = interviewResults.InterviewCommentsList;
-            if(interviewCommentsList.Count == 0)
+            if (interviewCommentsList.Count == 0)
             {
                 rowCount += 2;
             }

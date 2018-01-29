@@ -28,7 +28,7 @@ namespace TalentClassLibrary.Tests
             var input2 = TestData.GetInstance().TestExcelInterviewResultData();
             var expected = "匯出成功";
             //var actual = ExcelHelper.GetInstance().ExportInterviewData(input, input1, input2);
-           // Assert.AreEqual(expected, actual);
+            // Assert.AreEqual(expected, actual);
         }
 
         [TestMethod()]
@@ -38,8 +38,15 @@ namespace TalentClassLibrary.Tests
             var input1 = TestData.GetInstance().TestExcelInterviewInfoData();
             var input2 = TestData.GetInstance().TestExcelProjectExperienceData();
             var expected = "匯出成功";
-          //  var actual = ExcelHelper.GetInstance().ExportAllData(input, input1,input2);
-           // Assert.AreEqual(expected, actual);
+            //  var actual = ExcelHelper.GetInstance().ExportAllData(input, input1,input2);
+            // Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod()]
+        public void ImportOldTalentTest()
+        {
+            var input = @"..\..\..\Template\匯入資料範本(google duc).xlsx";
+            ExcelHelper.GetInstance().ImportOldTalent(input);
         }
     }
 }
