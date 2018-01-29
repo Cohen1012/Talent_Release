@@ -11,6 +11,7 @@ using ServiceStack;
 using Spire.Xls.Core;
 using System.Data;
 using ShareClassLibrary;
+using System.Windows.Forms;
 
 namespace TalentClassLibrary
 {
@@ -284,7 +285,13 @@ namespace TalentClassLibrary
                             switch (dt.Columns[j].ToString())
                             {
                                 case "日期":
-                                    if(valid)
+                                    string msg = Valid.GetInstance().ValidDateFormat(dt.Rows[i].ItemArray[j].ToString());
+                                    if (msg != string.Empty)
+                                    {
+                                        MessageBox.Show(msg);
+                                        return;
+                                    }
+
                                     contactStatus.Contact_Date = dt.Rows[i].ItemArray[j].ToString();
                                     break;
                                 case "聯絡狀況":
