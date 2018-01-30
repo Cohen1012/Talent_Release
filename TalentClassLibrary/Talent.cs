@@ -68,12 +68,13 @@ namespace TalentClassLibrary
 
             if (this.DelImageByInterviewId(interviewId) == "圖片刪除失敗")
             {
-                return "刪除失敗";
+
+                return "圖片刪除失敗";
             }
 
             if (this.DelFilesByInterviewId(interviewId) == "附加檔案刪除失敗")
             {
-                return "刪除失敗";
+                return "附加檔案刪除失敗";
             }
 
             string sqlStr = string.Empty;
@@ -109,9 +110,8 @@ namespace TalentClassLibrary
             catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
-                ErrorMessage = "資料庫發生錯誤";
                 this.RollbackTransaction();
-                return "刪除失敗";
+                return "資料庫發生錯誤";
             }
             finally
             {
@@ -128,12 +128,12 @@ namespace TalentClassLibrary
         {
             if (this.DelImageByContactId(id) == "圖片刪除失敗")
             {
-                return "刪除失敗";
+                return "圖片刪除失敗";
             }
 
             if (this.DelFilesByContactId(id) == "附加檔案刪除失敗")
             {
-                return "刪除失敗";
+                return "附加檔案刪除失敗";
             }
 
             try
@@ -168,8 +168,9 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
-                return "刪除失敗";
+                return "資料庫發生錯誤";
             }
             finally
             {
@@ -193,8 +194,9 @@ namespace TalentClassLibrary
                     this.CommitTransaction();
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
             }
             finally
@@ -222,8 +224,9 @@ namespace TalentClassLibrary
                     return states + "成功";
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
                 return states + "失敗";
             }
