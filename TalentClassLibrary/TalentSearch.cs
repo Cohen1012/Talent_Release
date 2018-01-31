@@ -95,20 +95,36 @@ namespace TalentClassLibrary
                 {
                     Id = idList[i].ToString(),
                 };
-                searchResult.Name = (from row in dt.AsEnumerable() where row.Field<int?>("Contact_Id") == idList[i] select row.Field<string>("Name")).Distinct().First();
-                searchResult.Code = (from row in dt.AsEnumerable() where row.Field<int?>("Contact_Id") == idList[i] select row.Field<string>("Code_Id")).Distinct().ToList();
-                var Status = (from row in dt.AsEnumerable()
+
+                DataSet dataSet = new DataSet();
+
+                DataTable contactDt = (from row in dt.AsEnumerable()
+                                       where row.Field<int>("Contact_Id") == idList[i]
+                                       select new
+                                       {
+                                           Contact_Id = row.Field<int>("Contact_Id"),
+                                           Name = row.Field<string>("Name"),
+                                           UpdateTime = row.Field<string>("UpdateTime")
+                                       }).Distinct().LinqQueryToDataTable();
+                DataTable codeDt = (from row in dt.AsEnumerable()
+                                     where row.Field<int>("Contact_Id") == idList[i]
+                                     select new
+                                     {
+                                         Code_Id = row.Field<string>("Code_Id")
+                                     }).Distinct().LinqQueryToDataTable();
+                DataTable statusDt = (from row in dt.AsEnumerable()
                               where row.Field<int>("Contact_Id") == idList[i]
                               select new
                               {
-                                  Contact_Date = row.Field<DateTime?>("Contact_Date"),
+                                  Contact_Date = row.Field<string>("Contact_Date"),
                                   Contact_Status = row.Field<string>("Contact_Status"),
                                   Remarks = row.Field<string>("Remarks")
-                              }
-                                       ).Distinct().ToList();
-                searchResult.Interview_Date = (from row in dt.AsEnumerable() where row.Field<int?>("Contact_Id") == idList[i] select row.Field<DateTime?>("Interview_Date").ToString()).Distinct().ToList();
-                searchResult.UpdateTime = (from row in dt.AsEnumerable() where row.Field<int?>("Contact_Id") == idList[i] select row.Field<string>("UpdateTime")).Distinct().First();
-                searchResultList.Add(searchResult);
+                              }).Distinct().OrderByDescending(x => x.Contact_Date).Take(2).LinqQueryToDataTable();
+                DataTable interviewDateDt = (from row in dt.AsEnumerable() where row.Field<int>("Contact_Id") == idList[i]
+                                               select new
+                                               {
+                                                   Interview_Date = row.Field<string>("Interview_Date")
+                                               }).Distinct().OrderByDescending(x => x.Interview_Date).Take(2).LinqQueryToDataTable();   
             }
             return dataTable;
         }

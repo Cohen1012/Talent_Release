@@ -937,7 +937,7 @@ namespace TalentClassLibrary
             try
             {
                 using (SqlCommand cmd = new SqlCommand(insert, ScConnection, StTransaction))
-                {
+                {                    
                     foreach (DataRow dr in inData.Rows)
                     {
                         cmd.Parameters.Clear();

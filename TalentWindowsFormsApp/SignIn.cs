@@ -26,14 +26,14 @@ namespace TalentWindowsFormsApp
         {
             X = this.Width;//獲取窗體的寬度
             Y = this.Height;//獲取窗體的高度
-           Talent.GetInstance().SetTag(this);//調用方法
+                            //Talent.GetInstance().SetTag(this);//調用方法
         }
 
         private void SignIn_Resize(object sender, EventArgs e)
         {
             float newx = (this.Width) / X; //窗體寬度縮放比例
             float newy = (this.Height) / Y;//窗體高度縮放比例
-            Talent.GetInstance().SetControls(newx, newy, this);//隨窗體改變控制項大小
+                                           // Talent.GetInstance().SetControls(newx, newy, this);//隨窗體改變控制項大小
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace TalentWindowsFormsApp
         /// <param name="e"></param>
         private void SignInBtn_Click(object sender, EventArgs e)
         {
-           string account = AccountTxt.Text;
+            string account = AccountTxt.Text;
             string password = PasswordTxt.Text;
             Msg = Talent.GetInstance().SignIn(account, password);
             if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
@@ -70,7 +70,7 @@ namespace TalentWindowsFormsApp
         /// <param name="e"></param>
         private void AccountTxt_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if(e.KeyChar == 13)
+            if (e.KeyChar == 13)
             {
                 PasswordTxt.Focus();
             }

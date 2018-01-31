@@ -44,7 +44,7 @@ namespace TalentWindowsFormsApp
             string EndInterviewDate = EndInterviewDateTxt.Text;
             ////從資料庫撈出符合條件的聯繫ID
             DataTable dataTable = TalentClassLibrary.TalentSearch.GetInstance().SelectIdByFilter(keyword, place, skills, cooperationMode, contactStatus, startEditDate, endEditDate, isInterview, interviewResult, startInterviewDate, EndInterviewDate);
-            if(!string.IsNullOrEmpty(TalentClassLibrary.TalentSearch.GetInstance().ErrorMessage))
+            if (!string.IsNullOrEmpty(TalentClassLibrary.TalentSearch.GetInstance().ErrorMessage))
             {
                 MessageBox.Show(TalentClassLibrary.TalentSearch.GetInstance().ErrorMessage);
                 return;
