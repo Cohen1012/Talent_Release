@@ -203,6 +203,12 @@ namespace TalentWindowsFormsApp
         private void UpdateProjectExperience()
         {
             DataSet ds = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
+            if(!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+            {
+                MessageBox.Show("專案經驗載入失敗");
+                return;
+            }
+
             ProjectExperienceDB = ds.Tables[3].Copy();
             ProjectExperienceDB = this.DBNullToEmpty(ProjectExperienceDB);
             this.ShowProjectExperience();
@@ -214,6 +220,12 @@ namespace TalentWindowsFormsApp
         private void UpdateInterviewResult()
         {
             DataSet ds = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
+            if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+            {
+                MessageBox.Show("面談結果載入失敗");
+                return;
+            }
+
             InterviewCommentsDB = ds.Tables[1].Copy();
             InterviewCommentsDB = this.DBNullToEmpty(InterviewCommentsDB);
             InterviewCommentsUI = ds.Tables[1].Copy();
@@ -338,6 +350,12 @@ namespace TalentWindowsFormsApp
         private void UpdateInterviewPage()
         {
             DataSet ds = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
+            if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+            {
+                MessageBox.Show("人事資料載入失敗");
+                return;
+            }
+
             InterviewInfoDB = ds.Tables[0].Copy();
             InterviewInfoDB = this.DBNullToEmpty(InterviewInfoDB);
             this.ShowInterviewInfo(InterviewInfoDB);

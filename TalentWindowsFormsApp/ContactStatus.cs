@@ -108,6 +108,11 @@ namespace TalentWindowsFormsApp
         private void ShowData()
         {
             DataSet ds = Talent.GetInstance().SelectContactSituationDataById(Contact_Id);
+            if (Talent.GetInstance().ErrorMessage != string.Empty)
+            {
+                MessageBox.Show(Talent.GetInstance().ErrorMessage, "錯誤訊息");
+            }
+
             ContactInfoDB = ds.Tables[0].Copy();
             ContactStatusDB = ds.Tables[1].Copy();
             ContactStatusUI = ds.Tables[1].Copy();
@@ -236,6 +241,12 @@ namespace TalentWindowsFormsApp
         private void UpdateTime_ConfirmBtnClick(object sender, EventArgs e)
         {
             DataSet ds = Talent.GetInstance().SelectContactSituationDataById(Contact_Id);
+            if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+            {
+                MessageBox.Show(Talent.GetInstance().ErrorMessage, "錯誤訊息");
+                return;
+            }
+
             foreach (DataRow dr in ds.Tables[3].Rows)
             {
                 UpdateTimeLbl.Text = dr["UpdateTime"].ToString();
@@ -552,7 +563,7 @@ namespace TalentWindowsFormsApp
             string sex = (SexCombo.SelectedItem.ToString() == "--請選擇--") ? string.Empty : SexCombo.SelectedItem.ToString();
             string status = (StatusCombo.SelectedItem.ToString() == "--請選擇--") ? string.Empty : StatusCombo.SelectedItem.ToString();
             string year = YearTxt.Text;
-            ContactInfoUI.Rows.Add(name, sex, mail, phone, cooperationMode, status, place, skill,year);
+            ContactInfoUI.Rows.Add(name, sex, mail, phone, cooperationMode, status, place, skill, year);
             ////代碼資料
             DataTable codeList = new DataTable();
             codeList.Columns.Add("Code_Id");

@@ -59,6 +59,12 @@ namespace TalentWindowsFormsApp
         private void ShowData()
         {
             FileDB = Talent.GetInstance().SelectFiles(InterviewId, AttachedFileMode).Copy();
+            if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+            {
+                MessageBox.Show(Talent.GetInstance().ErrorMessage, "錯誤訊息");
+                return;
+            }
+
             List<AttachedFiles> list = FileDB.DataTableToList<AttachedFiles>();
             foreach (AttachedFiles attachedFiles in list)
             {
@@ -189,11 +195,11 @@ namespace TalentWindowsFormsApp
                 return;
             }
 
-            foreach(FileControl fileControl in FileUI)
+            foreach (FileControl fileControl in FileUI)
             {
-                if(string.IsNullOrEmpty(fileControl.GetFilePath()))
+                if (string.IsNullOrEmpty(fileControl.GetFilePath()))
                 {
-                    MessageBox.Show("有空白的路徑","錯誤訊息");
+                    MessageBox.Show("有空白的路徑", "錯誤訊息");
                     return;
                 }
 
@@ -202,7 +208,7 @@ namespace TalentWindowsFormsApp
 
             string msg = Talent.GetInstance().SaveAttachedFilesToDB(FilePathList, InterviewId, AttachedFileMode);
             MessageBox.Show(msg, "訊息");
-            if(msg.Equals("檔案上傳成功"))
+            if (msg.Equals("檔案上傳成功"))
             {
                 this.DialogResult = DialogResult.OK;
                 this.Hide();

@@ -59,8 +59,6 @@ namespace TalentClassLibrary
         /// <returns></returns>
         public string DelInterviewDataByInterviewId(string interviewId)
         {
-            ErrorMessage = string.Empty;
-
             if (!this.ValidInterviewIdIsAppear(interviewId))
             {
                 return "此面談資料不存在";
@@ -236,11 +234,6 @@ namespace TalentClassLibrary
             }
         }
 
-        public string ExportDataToExcel(DataTable data)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// 將資料依狀態分類成修改，新增，刪除的DataTable
         /// </summary>
@@ -284,8 +277,9 @@ namespace TalentClassLibrary
                 ds.Tables.Add(delList);
                 return ds;
             }
-            catch
+            catch(Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 return new DataSet();
             }
         }
@@ -404,8 +398,9 @@ namespace TalentClassLibrary
                     return "刪除成功";
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
                 return "刪除失敗";
             }
@@ -487,8 +482,9 @@ namespace TalentClassLibrary
                     return "修改成功";
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
                 return "修改失敗";
             }
@@ -634,6 +630,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
                 return "新增失敗";
             }
@@ -672,6 +669,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 return "下載失敗";
             }
 
@@ -725,6 +723,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 serverFilePathList.Clear();
                 serverFilePathList.Add("上傳失敗");
                 return serverFilePathList;
@@ -800,6 +799,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 return "上傳失敗";
             }
         }
@@ -852,6 +852,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
                 return "檔案上傳失敗";
             }
@@ -897,6 +898,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
                 return "圖片上傳失敗";
             }
@@ -985,7 +987,7 @@ namespace TalentClassLibrary
                             string path = this.UpLoadImage(dr["Image"].ToString(), interviewId);
                             if (path.Equals("上傳失敗") || path.Equals("不存在的路徑"))
                             {
-                                throw new Exception();
+                                throw new Exception(path);
                             }
 
                             cmd.CommandText = @"update Interview_Info set Image = @image where Interview_Id = @Interview_Id";
@@ -1003,6 +1005,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
                 return "新增失敗";
             }
@@ -1063,6 +1066,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
                 return "新增失敗";
             }
@@ -1100,8 +1104,9 @@ namespace TalentClassLibrary
                     return "新增成功";
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
                 return "新增失敗";
             }
@@ -1125,8 +1130,9 @@ namespace TalentClassLibrary
 
                 return msg;
             }
-            catch
+            catch(Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 msg = "帳號須為本公司之帳號";
                 return msg;
             }
@@ -1188,6 +1194,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
                 return "儲存失敗";
             }
@@ -1238,6 +1245,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
                 return "儲存失敗";
             }
@@ -1286,6 +1294,7 @@ namespace TalentClassLibrary
             catch (Exception ex)
             {
                 this.RollbackTransaction();
+                LogInfo.WriteErrorInfo(ex);
                 return "儲存失敗";
             }
             finally
@@ -1347,6 +1356,7 @@ namespace TalentClassLibrary
             catch (Exception ex)
             {
                 this.RollbackTransaction();
+                LogInfo.WriteErrorInfo(ex);
                 return "儲存失敗";
             }
             finally
@@ -1367,6 +1377,7 @@ namespace TalentClassLibrary
         /// <returns>回傳符合條件的Id</returns>
         public List<string> SelectIdByContact(string places, string expertises, string cooperationMode, string states, string startEditDate, string endEditDate)
         {
+            ErrorMessage = string.Empty;
             DataTable dt = new DataTable();
             List<string> idList = new List<string>();
             try
@@ -1440,6 +1451,8 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
+                ErrorMessage = "資料庫發生錯誤";
                 return new List<string>();
             }
             finally
@@ -1455,6 +1468,7 @@ namespace TalentClassLibrary
         /// <returns>符合關鍵字的ID</returns>
         public List<string> SelectIdByKeyWord(string keyWords)
         {
+            ErrorMessage = string.Empty;
             DataTable dt = new DataTable();
             List<string> idList = new List<string>();
             try
@@ -1504,6 +1518,7 @@ namespace TalentClassLibrary
             catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
+                ErrorMessage = "資料庫發生錯誤";
                 return new List<string>();
             }
             finally
@@ -1522,6 +1537,7 @@ namespace TalentClassLibrary
         /// <returns>回傳符合條件的聯繫ID</returns>
         public List<string> SelectIdByInterviewFilter(string isInterview, string interviewResult, string startInterviewDate, string endInterviewDate)
         {
+            ErrorMessage = string.Empty;
             DataTable dt = new DataTable();
             List<string> idList = new List<string>();
             string select = string.Empty;
@@ -1573,8 +1589,10 @@ namespace TalentClassLibrary
                     return idList;
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
+                ErrorMessage = "資料庫發生錯誤";
                 return new List<string>();
             }
             finally
@@ -1696,8 +1714,14 @@ namespace TalentClassLibrary
             return dt;
         }
 
+        /// <summary>
+        /// 根據ID撈出人才資料
+        /// </summary>
+        /// <param name="idList"></param>
+        /// <returns></returns>
         public DataTable SelectTalentInfoById(List<string> idList)
         {
+            ErrorMessage = string.Empty;
             string select = string.Empty;
             DataSet ds = new DataSet();
             DataTable dt = new DataTable();
@@ -1730,6 +1754,8 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
+                ErrorMessage = "資料庫發生錯誤";
                 return new DataTable();
             }
             finally
@@ -1851,6 +1877,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 return "匯出失敗";
             }
         }
@@ -1919,6 +1946,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 return "匯出失敗";
             }
         }
@@ -1960,6 +1988,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 return "匯出失敗";
             }
         }
@@ -1971,6 +2000,7 @@ namespace TalentClassLibrary
         /// <returns></returns>
         public DataSet SelectContactSituationDataById(string id)
         {
+            ErrorMessage = string.Empty;
             DataSet ds = new DataSet();
             string select = @"select [Name],[Sex],[Mail],[CellPhone],[Cooperation_Mode],[Status],[Place],[Skill],[Year] from Contact_Info a where a.Contact_Id = @id
                               select CONVERT(varchar(100), a.Contact_Date, 111) Contact_Date,a.Contact_Status,a.Remarks from Contact_Situation a where a.Contact_Id = @id order by Contact_Date desc
@@ -1987,8 +2017,10 @@ namespace TalentClassLibrary
 
                 return ds;
             }
-            catch
+            catch(Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
+                ErrorMessage = "資料庫發生錯誤";
                 return new DataSet();
             }
             finally
@@ -2041,6 +2073,7 @@ namespace TalentClassLibrary
         /// <returns></returns>
         public DataTable SelectFiles(string interviewId, string filesMode)
         {
+            ErrorMessage = string.Empty;
             DataTable dt = new DataTable();
             string select = @"select File_Path,Belong from Files where Interview_Id = @Interview_Id and Belong = @Belong";
             try
@@ -2056,6 +2089,8 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
+                ErrorMessage = "資料庫發生錯誤";
                 return new DataTable();
             }
             finally
@@ -2071,6 +2106,7 @@ namespace TalentClassLibrary
         /// <returns></returns>
         public DataSet SelectInterviewDataById(string interviewId)
         {
+            ErrorMessage = string.Empty;
             DataSet ds = new DataSet();
             string SQLStr = @"select [Vacancies],CONVERT(varchar(100), Interview_Date, 111)Interview_Date,[Name],[Sex],CONVERT(varchar(100), [Birthday], 111) Birthday,[Married],[Mail],[Adress],[CellPhone],[Image]
                                     ,[Expertise_Language],[Expertise_Tools],[Expertise_Devops],[Expertise_OS],[Expertise_BigData],[Expertise_DataBase]
@@ -2092,6 +2128,8 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
+                ErrorMessage = "資料庫發生錯誤";
                 return new DataSet();
             }
             finally
@@ -2106,6 +2144,7 @@ namespace TalentClassLibrary
         /// <returns>使用者帳號資訊</returns>
         public DataTable SelectMemberInfo()
         {
+            ErrorMessage = string.Empty;
             DataTable dt = new DataTable();
             string select = @"select Account,States from Member where account != 'hr@is-land.com.tw'";
             try
@@ -2121,8 +2160,10 @@ namespace TalentClassLibrary
 
                 return dt;
             }
-            catch
+            catch(Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
+                ErrorMessage = "資料庫發生錯誤";
                 return new DataTable();
             }
             finally
@@ -2138,6 +2179,7 @@ namespace TalentClassLibrary
         /// <returns>帳號資訊EX：hr@is-land.com.tw,啟用</returns>
         public DataTable SelectMemberInfoByAccount(string account)
         {
+            ErrorMessage = string.Empty;
             DataTable dt = new DataTable();
             string select = @"select Account,States from Member where Account=@account";
             try
@@ -2154,8 +2196,10 @@ namespace TalentClassLibrary
 
                 return dt;
             }
-            catch
+            catch(Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
+                ErrorMessage = "資料庫發生錯誤";
                 return new DataTable();
             }
             finally
@@ -2172,6 +2216,7 @@ namespace TalentClassLibrary
         /// <returns>登入成功回傳帳號，登入失敗回傳"登入失敗"，該帳號停用中回傳"該帳號停用中"</returns>
         public string SignIn(string account, string password)
         {
+            ErrorMessage = string.Empty;
             string msg = "登入失敗";
             account = AddMailFormat(account);
             password = Common.GetInstance().PasswordEncryption(password.ToLower());
@@ -2202,6 +2247,8 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
+                ErrorMessage = "資料庫發生錯誤";
                 return msg;
             }
             finally
@@ -2251,9 +2298,10 @@ namespace TalentClassLibrary
                     return "修改成功";
                 }
             }
-            catch
+            catch(Exception ex)
             {
                 this.RollbackTransaction();
+                LogInfo.WriteErrorInfo(ex);
                 return "修改失敗";
             }
             finally
@@ -2305,6 +2353,7 @@ namespace TalentClassLibrary
             catch (Exception ex)
             {
                 this.RollbackTransaction();
+                LogInfo.WriteErrorInfo(ex);
                 return "儲存失敗";
             }
             finally
@@ -2357,6 +2406,7 @@ namespace TalentClassLibrary
             catch (Exception ex)
             {
                 this.RollbackTransaction();
+                LogInfo.WriteErrorInfo(ex);
                 return "儲存失敗";
             }
             finally
@@ -2395,6 +2445,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 return "附加檔案刪除失敗";
             }
             finally
@@ -2432,6 +2483,7 @@ namespace TalentClassLibrary
             }
             catch (IOException ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 return "圖片刪除失敗";
             }
             finally
@@ -2459,6 +2511,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 return "附加檔案刪除失敗";
             }
         }
@@ -2492,6 +2545,7 @@ namespace TalentClassLibrary
             }
             catch (IOException ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 return "圖片刪除失敗";
             }
             finally
@@ -2534,6 +2588,7 @@ namespace TalentClassLibrary
                 }
                 catch (IOException ex)
                 {
+                    LogInfo.WriteErrorInfo(ex);
                     return "檔案刪除失敗";
                 }
             }
@@ -2636,6 +2691,7 @@ namespace TalentClassLibrary
             catch (Exception ex)
             {
                 this.RollbackTransaction();
+                LogInfo.WriteErrorInfo(ex);
                 return "修改失敗";
             }
             finally
@@ -2659,9 +2715,10 @@ namespace TalentClassLibrary
                     return "修改成功";
                 }
             }
-            catch
+            catch(Exception ex)
             {
                 this.RollbackTransaction();
+                LogInfo.WriteErrorInfo(ex);
                 return "修改失敗";
             }
             finally
@@ -2704,9 +2761,10 @@ namespace TalentClassLibrary
                     return "修改成功";
                 }
             }
-            catch
+            catch(Exception ex)
             {
                 this.RollbackTransaction();
+                LogInfo.WriteErrorInfo(ex);
                 return "修改失敗";
             }
             finally
@@ -2777,8 +2835,9 @@ namespace TalentClassLibrary
                 }
                 return msg;
             }
-            catch
+            catch(Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 return false;
             }
             finally
@@ -2818,8 +2877,9 @@ namespace TalentClassLibrary
                 }
                 return msg;
             }
-            catch
+            catch(Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 return false;
             }
             finally
@@ -2924,6 +2984,7 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 msg = "發生未預期錯誤";
                 return msg;
             }
@@ -2972,12 +3033,7 @@ namespace TalentClassLibrary
             }
 
             return msg;
-        }
-
-        public string ValidFilePath(string filePath)
-        {
-            throw new NotImplementedException();
-        }
+        }       
 
         /// <summary>
         /// 驗證欲新增的帳號是否已存在
@@ -3023,8 +3079,9 @@ namespace TalentClassLibrary
                     }
                 }
             }
-            catch
+            catch(Exception ex)
             {
+                LogInfo.WriteErrorInfo(ex);
                 return "發生錯誤";
             }
             finally
@@ -3154,9 +3211,10 @@ namespace TalentClassLibrary
                     return "刪除成功";
                 }
             }
-            catch
+            catch(Exception ex)
             {
                 this.RollbackTransaction();
+                LogInfo.WriteErrorInfo(ex);
                 return "刪除失敗";
             }
             finally

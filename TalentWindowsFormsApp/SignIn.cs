@@ -46,6 +46,12 @@ namespace TalentWindowsFormsApp
            string account = AccountTxt.Text;
             string password = PasswordTxt.Text;
             Msg = Talent.GetInstance().SignIn(account, password);
+            if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+            {
+                MessageBox.Show(Talent.GetInstance().ErrorMessage);
+                return;
+            }
+
             if (Msg != "登入失敗" && Msg != "該帳號停用中")
             {
                 this.DialogResult = DialogResult.OK;

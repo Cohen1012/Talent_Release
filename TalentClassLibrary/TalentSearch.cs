@@ -40,18 +40,21 @@ namespace TalentClassLibrary
         /// <returns></returns>
         public DataTable SelectIdByFilter(string keyWords, string places, string expertises, string cooperationMode, string states, string startEditDate, string endEditDate, string isInterview, string interviewResult, string startInterviewDate, string endInterviewDate)
         {
+            ErrorMessage = string.Empty;
             DataTable dt = new DataTable();
-            string select = @"select Contact_Id,Name,Code_Id,Contact_Date,Contact_Status,Remarks,Interview_Date,CONVERT(varchar(100), UpdateTime, 111) UpdateTime from FilterTable where";
+            string select = @"select Contact_Id,Name,Code_Id,CONVERT(varchar(100), Contact_Date, 111) Contact_Date,Contact_Status,Remarks,CONVERT(varchar(100), Interview_Date, 111) Interview_Date,CONVERT(varchar(100), UpdateTime, 111) UpdateTime from FilterTable where";
             try
             {
                 if (Valid.GetInstance().ValidDateRange(startEditDate, endEditDate) != string.Empty)
                 {
-                    throw new Exception("最後編輯日之日期格式或者是日期區間不正確");
+                    ErrorMessage = "最後編輯日之日期格式或者是日期區間不正確";
+                    return new DataTable();
                 }
 
                 if (Valid.GetInstance().ValidDateRange(startInterviewDate, endInterviewDate) != string.Empty)
                 {
-                    throw new Exception("最後編輯日之日期格式或者是日期區間不正確");
+                    ErrorMessage = "面談日期之日期格式或者是日期區間不正確";
+                    return new DataTable();
                 }
 
                 using (SqlDataAdapter da = new SqlDataAdapter(select, ScConnection))
@@ -66,12 +69,48 @@ namespace TalentClassLibrary
             catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
-                throw ex;
+                ErrorMessage = "資料庫發生錯誤";
+                return new DataTable();
             }
             finally
             {
                 this.CloseDatabaseConnection();
             }
+        }
+
+        /// <summary>
+        /// 將查詢結果組合成符合格式的DataTable
+        /// </summary>
+        /// <param name="dt">查詢決果</param>
+        /// <returns></returns>
+        public DataTable CombinationGrid(DataTable dt)
+        {
+            DataTable dataTable = new DataTable();
+
+            var idList = dt.AsEnumerable().Select(x => x.Field<int>("Contact_Id")).Distinct().ToList();
+            List<SearchResult> searchResultList = new List<SearchResult>();
+            for (int i = 0; i < idList.Count; i++)
+            {
+                SearchResult searchResult = new SearchResult
+                {
+                    Id = idList[i].ToString(),
+                };
+                searchResult.Name = (from row in dt.AsEnumerable() where row.Field<int?>("Contact_Id") == idList[i] select row.Field<string>("Name")).Distinct().First();
+                searchResult.Code = (from row in dt.AsEnumerable() where row.Field<int?>("Contact_Id") == idList[i] select row.Field<string>("Code_Id")).Distinct().ToList();
+                var Status = (from row in dt.AsEnumerable()
+                              where row.Field<int>("Contact_Id") == idList[i]
+                              select new
+                              {
+                                  Contact_Date = row.Field<DateTime?>("Contact_Date"),
+                                  Contact_Status = row.Field<string>("Contact_Status"),
+                                  Remarks = row.Field<string>("Remarks")
+                              }
+                                       ).Distinct().ToList();
+                searchResult.Interview_Date = (from row in dt.AsEnumerable() where row.Field<int?>("Contact_Id") == idList[i] select row.Field<DateTime?>("Interview_Date").ToString()).Distinct().ToList();
+                searchResult.UpdateTime = (from row in dt.AsEnumerable() where row.Field<int?>("Contact_Id") == idList[i] select row.Field<string>("UpdateTime")).Distinct().First();
+                searchResultList.Add(searchResult);
+            }
+            return dataTable;
         }
 
         /// <summary>
@@ -171,41 +210,6 @@ namespace TalentClassLibrary
             }
 
             return da;
-        }
-
-        /// <summary>
-        /// 將查詢結果組合成符合格式的DataTable
-        /// </summary>
-        /// <param name="dt">查詢決果</param>
-        /// <returns></returns>
-        public DataTable CombinationGrid(DataTable dt)
-        {
-            DataTable dataTable = new DataTable();
-
-            var idList = dt.AsEnumerable().Select(x => x.Field<int>("Contact_Id")).Distinct().ToList();
-            List<SearchResult> searchResultList = new List<SearchResult>();
-            for (int i = 0; i < idList.Count; i++)
-            {
-                SearchResult searchResult = new SearchResult
-                {
-                    Id = idList[i].ToString(),
-                };
-                searchResult.Name = (from row in dt.AsEnumerable() where row.Field<int?>("Contact_Id") == idList[i] select row.Field<string>("Name")).Distinct().First();
-                searchResult.Code = (from row in dt.AsEnumerable() where row.Field<int?>("Contact_Id") == idList[i] select row.Field<string>("Code_Id")).Distinct().ToList();
-                var Status = (from row in dt.AsEnumerable()
-                              where row.Field<int>("Contact_Id") == idList[i]
-                              select new
-                              {
-                                  Contact_Date = row.Field<DateTime?>("Contact_Date"),
-                                  Contact_Status = row.Field<string>("Contact_Status"),
-                                  Remarks = row.Field<string>("Remarks")
-                              }
-                                       ).Distinct().ToList();
-                searchResult.Interview_Date = (from row in dt.AsEnumerable() where row.Field<int?>("Contact_Id") == idList[i] select row.Field<DateTime?>("Interview_Date").ToString()).Distinct().ToList();
-                searchResult.UpdateTime = (from row in dt.AsEnumerable() where row.Field<int?>("Contact_Id") == idList[i] select row.Field<string>("UpdateTime")).Distinct().First();
-                searchResultList.Add(searchResult);
-            }
-            return dataTable;
         }
 
         /// <summary>

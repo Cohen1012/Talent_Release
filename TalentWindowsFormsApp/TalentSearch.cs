@@ -43,9 +43,21 @@ namespace TalentWindowsFormsApp
             string startInterviewDate = StartInterviewDateTxt.Text;
             string EndInterviewDate = EndInterviewDateTxt.Text;
             ////從資料庫撈出符合條件的聯繫ID
-            //DataTable dataTable = TalentClassLibrary.TalentSearch.GetInstance().SelectIdByFilter(keyword, place, skills, cooperationMode, contactStatus, startEditDate, endEditDate, isInterview, interviewResult, startInterviewDate, EndInterviewDate);
-            //TalentClassLibrary.TalentSearch.GetInstance().CombinationGrid(dataTable);
-            //return;
+            DataTable dataTable = TalentClassLibrary.TalentSearch.GetInstance().SelectIdByFilter(keyword, place, skills, cooperationMode, contactStatus, startEditDate, endEditDate, isInterview, interviewResult, startInterviewDate, EndInterviewDate);
+            if(!string.IsNullOrEmpty(TalentClassLibrary.TalentSearch.GetInstance().ErrorMessage))
+            {
+                MessageBox.Show(TalentClassLibrary.TalentSearch.GetInstance().ErrorMessage);
+                return;
+            }
+
+            if (dataTable.Rows.Count == 0)
+            {
+                MessageBox.Show("沒有符合的資料", "訊息");
+                return;
+            }
+
+            TalentClassLibrary.TalentSearch.GetInstance().CombinationGrid(dataTable);
+            return;
 
             List<string> contactIdList = Talent.GetInstance().SelectIdByFilter(keyword, place, skills, cooperationMode, contactStatus, startEditDate, endEditDate, isInterview, interviewResult, startInterviewDate, EndInterviewDate);
             dataGridView1.Columns.Clear();

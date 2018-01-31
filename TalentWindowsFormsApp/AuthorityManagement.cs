@@ -39,6 +39,12 @@ namespace TalentWindowsFormsApp
 
                 dataGridView2.AutoGenerateColumns = false;
                 DataTable dt = Talent.GetInstance().SelectMemberInfo();
+                if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+                {
+                    MessageBox.Show(Talent.GetInstance().ErrorMessage);
+                    return;
+                }
+
                 dataGridView2.DataSource = dt;
                 dt.Columns.Add("Reset");
                 foreach (DataRow dr in dt.Rows)
@@ -100,7 +106,13 @@ namespace TalentWindowsFormsApp
 
         private void AuthorityManagement_Load(object sender, EventArgs e)
         {
-            DataTable dt = Talent.GetInstance().SelectMemberInfoByAccount(Account);
+            DataTable dt = Talent.GetInstance().SelectMemberInfoByAccount(Account);            
+            if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+            {
+                MessageBox.Show(Talent.GetInstance().ErrorMessage);
+                return;
+            }
+
             dt.Columns[0].ColumnName = "帳號";
             dt.Columns[1].ColumnName = "狀態";
             dataGridView1.DataSource = dt;
