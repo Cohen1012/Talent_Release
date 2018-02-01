@@ -1769,7 +1769,7 @@ namespace TalentClassLibrary
         /// </summary>
         /// <param name="ds">查詢決果</param>
         /// <param name="dt">輸出DataTable</param>
-        private static void CombinationGrid(DataSet ds, DataTable dt)
+        public static void CombinationGrid(DataSet ds, DataTable dt)
         {
             DataRow row = dt.NewRow();
             foreach (DataRow dr in ds.Tables[0].Rows)

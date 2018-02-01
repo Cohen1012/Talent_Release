@@ -23,15 +23,6 @@ namespace TalentClassLibrary.Tests
         }
 
         [TestMethod()]
-        public void ExportDataToExcelTest()
-        {
-            var input = TestData.GetInstance().TestExportData();
-            var expect = "匯出成功";
-            var actual = Talent.GetInstance().ExportDataToExcel(input);
-            Assert.AreEqual(expect, actual);
-        }
-
-        [TestMethod()]
         public void InsertContactSituationTest()
         {
             var input = TestData.GetInstance().TestContactSituationData();

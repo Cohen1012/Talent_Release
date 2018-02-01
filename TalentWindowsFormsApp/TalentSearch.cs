@@ -27,6 +27,9 @@ namespace TalentWindowsFormsApp
             IsInterviewCombo.SelectedItem = "不限";
             InterviewResultCombo.SelectedItem = "不限";
             ExportCombo.SelectedItem = "聯繫狀況";
+
+            //DataTable dt = TalentClassLibrary.TalentSearch.GetInstance().SelectTop15();
+            //ShowData(ref dt);
         }
 
         private void SearchBtn_Click(object sender, EventArgs e)
@@ -42,37 +45,34 @@ namespace TalentWindowsFormsApp
             string interviewResult = InterviewResultCombo.SelectedItem.ToString();
             string startInterviewDate = StartInterviewDateTxt.Text;
             string EndInterviewDate = EndInterviewDateTxt.Text;
-            ////從資料庫撈出符合條件的聯繫ID
-            DataTable dataTable = TalentClassLibrary.TalentSearch.GetInstance().SelectIdByFilter(keyword, place, skills, cooperationMode, contactStatus, startEditDate, endEditDate, isInterview, interviewResult, startInterviewDate, EndInterviewDate);
+            ////從資料庫撈出符合條件的結果
+            DataTable dt = TalentClassLibrary.TalentSearch.GetInstance().SelectIdByFilter(keyword, place, skills, cooperationMode, contactStatus, startEditDate, endEditDate, isInterview, interviewResult, startInterviewDate, EndInterviewDate);
+            ShowData(ref dt);
+        }
+
+        private void ShowData(ref DataTable dt)
+        {
             if (!string.IsNullOrEmpty(TalentClassLibrary.TalentSearch.GetInstance().ErrorMessage))
             {
                 MessageBox.Show(TalentClassLibrary.TalentSearch.GetInstance().ErrorMessage);
                 return;
             }
 
-            if (dataTable.Rows.Count == 0)
-            {
-                MessageBox.Show("沒有符合的資料", "訊息");
-                return;
-            }
-
-            TalentClassLibrary.TalentSearch.GetInstance().CombinationGrid(dataTable);
-            return;
-
-            List<string> contactIdList = Talent.GetInstance().SelectIdByFilter(keyword, place, skills, cooperationMode, contactStatus, startEditDate, endEditDate, isInterview, interviewResult, startInterviewDate, EndInterviewDate);
-            dataGridView1.Columns.Clear();
-            if (contactIdList.Count == 0)
-            {
-                MessageBox.Show("沒有符合的資料", "訊息");
-                return;
-            }
-            DataTable dt = new DataTable();
-            dt = Talent.GetInstance().SelectTalentInfoById(contactIdList);
             if (dt.Rows.Count == 0)
             {
-                MessageBox.Show("發生錯誤", "錯誤訊息");
+                MessageBox.Show("沒有符合的資料", "訊息");
                 return;
             }
+
+            dt = TalentClassLibrary.TalentSearch.GetInstance().CombinationGrid(dt);
+            if (!string.IsNullOrEmpty(TalentClassLibrary.TalentSearch.GetInstance().ErrorMessage))
+            {
+                MessageBox.Show(TalentClassLibrary.TalentSearch.GetInstance().ErrorMessage);
+                return;
+            }
+
+            dataGridView1.Columns.Clear();
+
             dt.Columns.Add("UpdateTalent");
             dt.Columns.Add("DelTalent");
             foreach (DataRow dr in dt.Rows)
@@ -277,7 +277,7 @@ namespace TalentWindowsFormsApp
             switch (exportMode)
             {
                 case "聯繫狀況":
-                    msg = Talent.GetInstance().ExportContactSituationDataByContactId(idList,path);
+                    msg = Talent.GetInstance().ExportContactSituationDataByContactId(idList, path);
                     break;
                 case "面談資料":
                     msg = Talent.GetInstance().ExportInterviewDataByContactId(idList, path);
@@ -290,7 +290,7 @@ namespace TalentWindowsFormsApp
                     break;
             }
 
-            MessageBox.Show(msg,"訊息");
+            MessageBox.Show(msg, "訊息");
 
         }
 
@@ -314,7 +314,7 @@ namespace TalentWindowsFormsApp
                 RestoreDirectory = true
             };
 
-            if(ofd.ShowDialog() == DialogResult.OK)
+            if (ofd.ShowDialog() == DialogResult.OK)
             {
 
             }

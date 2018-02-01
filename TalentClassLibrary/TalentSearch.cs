@@ -24,6 +24,36 @@ namespace TalentClassLibrary
         public string ErrorMessage { get; set; }
 
         /// <summary>
+        /// 進入查詢頁面時，顯示最新(依造最後編輯日降冪排序)的15筆資料
+        /// </summary>
+        /// <returns></returns>
+        public DataTable SelectTop15()
+        {
+            ErrorMessage = string.Empty;
+            DataTable dt = new DataTable();
+            string select = @"select top 15 Contact_Id,Name,Code_Id,CONVERT(varchar(100), Contact_Date, 111) Contact_Date,Contact_Status,Remarks,CONVERT(varchar(100), Interview_Date, 111) Interview_Date,CONVERT(varchar(100), UpdateTime, 111) UpdateTime from FilterTable  order by UpdateTime desc";
+            try
+            {
+                using (SqlDataAdapter da = new SqlDataAdapter(select, ScConnection))
+                {
+                    da.Fill(dt);
+                }
+
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                LogInfo.WriteErrorInfo(ex);
+                ErrorMessage = "資料庫發生錯誤";
+                return new DataTable();
+            }
+            finally
+            {
+                this.CloseDatabaseConnection();
+            }
+        }
+
+        /// <summary>
         /// 根據條件查詢符合的資料
         /// </summary>
         /// <param name="keyWords">關鍵字，如有多個關鍵字請用","隔開</param>
@@ -61,6 +91,8 @@ namespace TalentClassLibrary
                 {
                     this.CombinationWhereByContactFilter(places, expertises, cooperationMode, states, startEditDate, endEditDate, da);
                     this.CombinationWhereByInterviewFilter(isInterview, interviewResult, startInterviewDate, endInterviewDate, da);
+                    this.CombinationWhereByKeyWord(keyWords, da);
+                    da.SelectCommand.CommandText += " order by UpdateTime desc";
                     da.Fill(dt);
                 }
 
@@ -85,48 +117,63 @@ namespace TalentClassLibrary
         /// <returns></returns>
         public DataTable CombinationGrid(DataTable dt)
         {
-            DataTable dataTable = new DataTable();
-
-            var idList = dt.AsEnumerable().Select(x => x.Field<int>("Contact_Id")).Distinct().ToList();
-            List<SearchResult> searchResultList = new List<SearchResult>();
-            for (int i = 0; i < idList.Count; i++)
+            ErrorMessage = string.Empty;
+            try
             {
-                SearchResult searchResult = new SearchResult
+                DataTable dataTable = dt.Clone();
+                var idList = dt.AsEnumerable().Select(x => x.Field<int>("Contact_Id")).Distinct().ToList();
+                List<SearchResult> searchResultList = new List<SearchResult>();
+                for (int i = 0; i < idList.Count; i++)
                 {
-                    Id = idList[i].ToString(),
-                };
+                    SearchResult searchResult = new SearchResult
+                    {
+                        Id = idList[i].ToString(),
+                    };
 
-                DataSet dataSet = new DataSet();
+                    DataSet dataSet = new DataSet();
 
-                DataTable contactDt = (from row in dt.AsEnumerable()
-                                       where row.Field<int>("Contact_Id") == idList[i]
-                                       select new
-                                       {
-                                           Contact_Id = row.Field<int>("Contact_Id"),
-                                           Name = row.Field<string>("Name"),
-                                           UpdateTime = row.Field<string>("UpdateTime")
-                                       }).Distinct().LinqQueryToDataTable();
-                DataTable codeDt = (from row in dt.AsEnumerable()
-                                     where row.Field<int>("Contact_Id") == idList[i]
-                                     select new
-                                     {
-                                         Code_Id = row.Field<string>("Code_Id")
-                                     }).Distinct().LinqQueryToDataTable();
-                DataTable statusDt = (from row in dt.AsEnumerable()
-                              where row.Field<int>("Contact_Id") == idList[i]
-                              select new
-                              {
-                                  Contact_Date = row.Field<string>("Contact_Date"),
-                                  Contact_Status = row.Field<string>("Contact_Status"),
-                                  Remarks = row.Field<string>("Remarks")
-                              }).Distinct().OrderByDescending(x => x.Contact_Date).Take(2).LinqQueryToDataTable();
-                DataTable interviewDateDt = (from row in dt.AsEnumerable() where row.Field<int>("Contact_Id") == idList[i]
-                                               select new
-                                               {
-                                                   Interview_Date = row.Field<string>("Interview_Date")
-                                               }).Distinct().OrderByDescending(x => x.Interview_Date).Take(2).LinqQueryToDataTable();   
+                    DataTable contactDt = (from row in dt.AsEnumerable()
+                                           where row.Field<int>("Contact_Id") == idList[i]
+                                           select new
+                                           {
+                                               Contact_Id = row.Field<int>("Contact_Id"),
+                                               Name = row.Field<string>("Name"),
+                                               UpdateTime = row.Field<string>("UpdateTime")
+                                           }).Distinct().LinqQueryToDataTable();
+                    DataTable codeDt = (from row in dt.AsEnumerable()
+                                        where row.Field<int>("Contact_Id") == idList[i]
+                                        select new
+                                        {
+                                            Code_Id = row.Field<string>("Code_Id")
+                                        }).Distinct().LinqQueryToDataTable();
+                    DataTable statusDt = (from row in dt.AsEnumerable()
+                                          where row.Field<int>("Contact_Id") == idList[i]
+                                          select new
+                                          {
+                                              Contact_Date = row.Field<string>("Contact_Date"),
+                                              Contact_Status = row.Field<string>("Contact_Status"),
+                                              Remarks = row.Field<string>("Remarks")
+                                          }).Distinct().OrderByDescending(x => x.Contact_Date).Take(2).LinqQueryToDataTable();
+                    DataTable interviewDateDt = (from row in dt.AsEnumerable()
+                                                 where row.Field<int>("Contact_Id") == idList[i]
+                                                 select new
+                                                 {
+                                                     Interview_Date = row.Field<string>("Interview_Date")
+                                                 }).Distinct().OrderByDescending(x => x.Interview_Date).Take(2).LinqQueryToDataTable();
+                    dataSet.Tables.Add(contactDt);
+                    dataSet.Tables.Add(codeDt);
+                    dataSet.Tables.Add(statusDt);
+                    dataSet.Tables.Add(interviewDateDt);
+                    Talent.CombinationGrid(dataSet, dataTable);
+                }
+                return dataTable;
             }
-            return dataTable;
+            catch (Exception ex)
+            {
+                LogInfo.WriteErrorInfo(ex);
+                ErrorMessage = "查詢時，發生錯誤";
+                return new DataTable();
+            }
         }
 
         /// <summary>
@@ -167,6 +214,7 @@ namespace TalentClassLibrary
 
             return da;
         }
+
         /// <summary>
         /// 組合聯繫資訊的where語法
         /// </summary>
@@ -222,6 +270,42 @@ namespace TalentClassLibrary
                 {
                     da.SelectCommand.CommandText += @" or ISNULL(Skill,'NA') Like ISNULL(ISNULL(@skill" + (i + 1) + ", Skill),'NA')";
                     da.SelectCommand.Parameters.Add("@skill" + (i + 1), SqlDbType.NVarChar).Value = Common.GetInstance().ValueIsNullOrEmpty("%" + expertise[i] + "%");
+                }
+            }
+
+            return da;
+        }
+
+        /// <summary>
+        /// 組合關鍵字的where語法
+        /// </summary>
+        /// <param name="keyWords">關鍵字，如有多個關鍵字請用","隔開</param>
+        /// <param name="da"></param>
+        /// <returns></returns>
+        private SqlDataAdapter CombinationWhereByKeyWord(string keyWords, SqlDataAdapter da)
+        {
+            if (string.IsNullOrEmpty(keyWords))
+            {
+                return da;
+            }
+
+            string[] keyWord = keyWords.Split(',');
+            for (int i = 0; i < keyWord.Length; i++)
+            {
+                if(string.IsNullOrEmpty(keyWord[i]))
+                {
+                    continue;
+                }
+
+                if(i == 0)
+                {
+                    da.SelectCommand.CommandText += @"and Name like @word" + (i + 1) + " or Code_Id like @word" + (i + 1);
+                    da.SelectCommand.Parameters.Add("@word" + (i + 1), SqlDbType.NVarChar).Value = "%" + keyWord[i] + "%";
+                }
+                else
+                {
+                    da.SelectCommand.CommandText += @" or Name like @word" + (i + 1) + " or Code_Id like @word" + (i + 1);
+                    da.SelectCommand.Parameters.Add("@word" + (i + 1), SqlDbType.NVarChar).Value = "%" + keyWord[i] + "%";
                 }
             }
 
