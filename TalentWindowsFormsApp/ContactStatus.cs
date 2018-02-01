@@ -139,9 +139,9 @@ namespace TalentWindowsFormsApp
             {
                 TextBox code = new TextBox
                 {
-                    Size = new System.Drawing.Size(134, 22),
+                    Size = new Size(134, 22),
                     Location = new Point(98, 42),
-                    Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)))
+                    Font = new Font("新細明體", 9F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(136)))
                 };
                 CodeTxt.Add(code);
                 splitContainer2.Panel1.Controls.Add(code);
@@ -193,7 +193,6 @@ namespace TalentWindowsFormsApp
 
             if (dt.Rows.Count == 0)
             {
-                //this.NewInterviewPage();
                 return;
             }
 
@@ -204,7 +203,7 @@ namespace TalentWindowsFormsApp
                 {
                     Text = "面談資料" + tabControl1.TabCount,
                     Name = "Interview" + tabControl1.TabCount,
-                    AutoScroll = true
+                    AutoScroll = true,
                 };
                 InterviewDataControl newInterview = new InterviewDataControl(dr[0].ToString(), Contact_Id);
                 newInterview.BtnClick += DelInterview_BtnClick;

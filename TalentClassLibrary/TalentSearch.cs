@@ -31,7 +31,10 @@ namespace TalentClassLibrary
         {
             ErrorMessage = string.Empty;
             DataTable dt = new DataTable();
-            string select = @"select top 15 Contact_Id,Name,Code_Id,CONVERT(varchar(100), Contact_Date, 111) Contact_Date,Contact_Status,Remarks,CONVERT(varchar(100), Interview_Date, 111) Interview_Date,CONVERT(varchar(100), UpdateTime, 111) UpdateTime from FilterTable  order by UpdateTime desc";
+            string select = @"select Contact_Id,Name,Code_Id,CONVERT(varchar(100), Contact_Date, 111) Contact_Date,Contact_Status,Remarks,CONVERT(varchar(100), Interview_Date, 111) Interview_Date,CONVERT(varchar(100), UpdateTime, 120) UpdateTime 
+                              from FilterTable where Contact_Id in(
+                              select a.Contact_Id
+                              from (select distinct top 15 Contact_Id,UpdateTime from FilterTable order by UpdateTime desc) a)";
             try
             {
                 using (SqlDataAdapter da = new SqlDataAdapter(select, ScConnection))
@@ -72,7 +75,7 @@ namespace TalentClassLibrary
         {
             ErrorMessage = string.Empty;
             DataTable dt = new DataTable();
-            string select = @"select Contact_Id,Name,Code_Id,CONVERT(varchar(100), Contact_Date, 111) Contact_Date,Contact_Status,Remarks,CONVERT(varchar(100), Interview_Date, 111) Interview_Date,CONVERT(varchar(100), UpdateTime, 111) UpdateTime from FilterTable where";
+            string select = @"select Contact_Id,Name,Code_Id,CONVERT(varchar(100), Contact_Date, 111) Contact_Date,Contact_Status,Remarks,CONVERT(varchar(100), Interview_Date, 111) Interview_Date,CONVERT(varchar(100), UpdateTime, 120) UpdateTime from FilterTable where";
             try
             {
                 if (Valid.GetInstance().ValidDateRange(startEditDate, endEditDate) != string.Empty)

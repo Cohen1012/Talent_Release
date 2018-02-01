@@ -28,8 +28,8 @@ namespace TalentWindowsFormsApp
             InterviewResultCombo.SelectedItem = "不限";
             ExportCombo.SelectedItem = "聯繫狀況";
 
-            //DataTable dt = TalentClassLibrary.TalentSearch.GetInstance().SelectTop15();
-            //ShowData(ref dt);
+            DataTable dt = TalentClassLibrary.TalentSearch.GetInstance().SelectTop15();
+            ShowData(ref dt);
         }
 
         private void SearchBtn_Click(object sender, EventArgs e)
@@ -50,6 +50,10 @@ namespace TalentWindowsFormsApp
             ShowData(ref dt);
         }
 
+        /// <summary>
+        /// 將顯示查詢結果
+        /// </summary>
+        /// <param name="dt"></param>
         private void ShowData(ref DataTable dt)
         {
             if (!string.IsNullOrEmpty(TalentClassLibrary.TalentSearch.GetInstance().ErrorMessage))
@@ -318,6 +322,11 @@ namespace TalentWindowsFormsApp
             {
 
             }
+        }
+
+        private void ExportCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -430,7 +430,6 @@ namespace TalentClassLibrary
             sheet.Range["M" + row + ":O" + row].Style.Borders[BordersLineType.EdgeBottom].LineStyle = LineStyleType.Double;
             sheet.Range[row, 13].Style.HorizontalAlignment = HorizontalAlignType.Left;
             ChcekedExpertise(interviewInfo.Expertise_Language, sheet, row, Expertise_Language, 13);
-
             ////----開發工具
             row += 2;
             sheet.Range[row, 4].Text = "開發工具";
@@ -443,40 +442,42 @@ namespace TalentClassLibrary
             sheet.Range[row, 8].Text = "Framwork";
             sheet.Range["I" + row + ":J" + row].Merge();
             sheet.Range["I" + row + ":J" + row].Style.Borders[BordersLineType.EdgeBottom].LineStyle = LineStyleType.Double;
+            sheet.Range[row, 9].Text = interviewInfo.Expertise_Tools_Framwork ?? string.Empty;
             sheet.Range[row, 9].Style.HorizontalAlignment = HorizontalAlignType.Left;
             sheet.Range[row, 11].Text = "其他";
             sheet.Range["L" + row + ":O" + row].Merge();
             sheet.Range["L" + row + ":O" + row].Style.Borders[BordersLineType.EdgeBottom].LineStyle = LineStyleType.Double;
             sheet.Range[row, 12].Style.HorizontalAlignment = HorizontalAlignType.Left;
-            if (!string.IsNullOrEmpty(interviewInfo.Expertise_Tools))
-            {
-                string[] expertiseTools = interviewInfo.Expertise_Tools.Split(',');
-                for (int i = 0; i < expertiseTools.Length; i++)
-                {
-                    for (int j = 0; j < Expertise_Tools.Length; j++)
-                    {
-                        if (Expertise_Tools[j] == expertiseTools[i])
-                        {
-                            sheet.Range[row, (j + 5)].Text = "■" + Expertise_Tools[j];
-                            break;
-                        }
+            ChcekedExpertise(interviewInfo.Expertise_Tools, sheet, row, Expertise_Tools, 12);
+            //if (!string.IsNullOrEmpty(interviewInfo.Expertise_Tools))
+            //{
+            //    string[] expertiseTools = interviewInfo.Expertise_Tools.Split(',');
+            //    for (int i = 0; i < expertiseTools.Length; i++)
+            //    {
+            //        for (int j = 0; j < Expertise_Tools.Length; j++)
+            //        {
+            //            if (Expertise_Tools[j] == expertiseTools[i])
+            //            {
+            //                sheet.Range[row, (j + 5)].Text = "■" + Expertise_Tools[j];
+            //                break;
+            //            }
 
-                        if (j == Expertise_Tools.Length - 1)
-                        {
-                            if (expertiseTools[i].StartsWith("Framwork："))
-                            {
-                                sheet.Range[row, 9].Text += expertiseTools[i].Substring(9);
-                            }
-                            else
-                            {
-                                sheet.Range[row, 12].Text += expertiseTools[i] + ",";
-                            }
-                        }
-                    }
-                }
+            //            if (j == Expertise_Tools.Length - 1)
+            //            {
+            //                if (expertiseTools[i].StartsWith("Framwork："))
+            //                {
+            //                    sheet.Range[row, 9].Text += expertiseTools[i].Substring(9);
+            //                }
+            //                else
+            //                {
+            //                    sheet.Range[row, 12].Text += expertiseTools[i] + ",";
+            //                }
+            //            }
+            //        }
+            //    }
 
-                sheet.Range[row, 12].Text = this.RemoveEndWithComma(sheet.Range[row, 12].Text);
-            }
+            //    sheet.Range[row, 12].Text = this.RemoveEndWithComma(sheet.Range[row, 12].Text);
+            //}
             ////----Devops
             row += 2;
             sheet.Range[row, 4].Text = "Devops";

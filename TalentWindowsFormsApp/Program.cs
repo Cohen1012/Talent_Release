@@ -16,7 +16,7 @@ namespace TalentWindowsFormsApp
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new TalentSearch());
+            Application.Run(new Main());
         }
     }
 }

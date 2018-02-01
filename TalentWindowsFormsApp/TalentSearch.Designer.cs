@@ -28,11 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.ImportLink = new System.Windows.Forms.LinkLabel();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.ExportCombo = new System.Windows.Forms.ComboBox();
+            this.ImportLink = new System.Windows.Forms.LinkLabel();
             this.ExportLink = new System.Windows.Forms.LinkLabel();
             this.CalendarBtn3 = new System.Windows.Forms.Button();
             this.EndInterviewDateTxt = new System.Windows.Forms.TextBox();
@@ -71,6 +72,7 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -101,12 +103,11 @@
             // 
             // splitContainer2.Panel1
             // 
-            this.splitContainer2.Panel1.Controls.Add(this.ImportLink);
-            this.splitContainer2.Panel1.Controls.Add(this.ExportCombo);
-            this.splitContainer2.Panel1.Controls.Add(this.ExportLink);
+            this.splitContainer2.Panel1.Controls.Add(this.panel1);
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.AutoScroll = true;
             this.splitContainer2.Panel2.Controls.Add(this.CalendarBtn3);
             this.splitContainer2.Panel2.Controls.Add(this.EndInterviewDateTxt);
             this.splitContainer2.Panel2.Controls.Add(this.CalendarBtn2);
@@ -139,17 +140,17 @@
             this.splitContainer2.SplitterDistance = 57;
             this.splitContainer2.TabIndex = 0;
             // 
-            // ImportLink
+            // panel1
             // 
-            this.ImportLink.AutoSize = true;
-            this.ImportLink.Font = new System.Drawing.Font("新細明體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.ImportLink.Location = new System.Drawing.Point(748, 22);
-            this.ImportLink.Name = "ImportLink";
-            this.ImportLink.Size = new System.Drawing.Size(47, 19);
-            this.ImportLink.TabIndex = 30;
-            this.ImportLink.TabStop = true;
-            this.ImportLink.Text = "匯入";
-            this.ImportLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ImportLink_LinkClicked);
+            this.panel1.AutoScroll = true;
+            this.panel1.Controls.Add(this.ExportCombo);
+            this.panel1.Controls.Add(this.ImportLink);
+            this.panel1.Controls.Add(this.ExportLink);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(807, 57);
+            this.panel1.TabIndex = 31;
             // 
             // ExportCombo
             // 
@@ -158,16 +159,29 @@
             "聯繫狀況",
             "面談資料",
             "所有資料"});
-            this.ExportCombo.Location = new System.Drawing.Point(600, 20);
+            this.ExportCombo.Location = new System.Drawing.Point(554, 23);
             this.ExportCombo.Name = "ExportCombo";
             this.ExportCombo.Size = new System.Drawing.Size(89, 21);
             this.ExportCombo.TabIndex = 29;
+            this.ExportCombo.SelectedIndexChanged += new System.EventHandler(this.ExportCombo_SelectedIndexChanged);
+            // 
+            // ImportLink
+            // 
+            this.ImportLink.AutoSize = true;
+            this.ImportLink.Font = new System.Drawing.Font("新細明體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.ImportLink.Location = new System.Drawing.Point(702, 25);
+            this.ImportLink.Name = "ImportLink";
+            this.ImportLink.Size = new System.Drawing.Size(47, 19);
+            this.ImportLink.TabIndex = 30;
+            this.ImportLink.TabStop = true;
+            this.ImportLink.Text = "匯入";
+            this.ImportLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ImportLink_LinkClicked);
             // 
             // ExportLink
             // 
             this.ExportLink.AutoSize = true;
             this.ExportLink.Font = new System.Drawing.Font("新細明體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.ExportLink.Location = new System.Drawing.Point(695, 22);
+            this.ExportLink.Location = new System.Drawing.Point(649, 25);
             this.ExportLink.Name = "ExportLink";
             this.ExportLink.Size = new System.Drawing.Size(47, 19);
             this.ExportLink.TabIndex = 0;
@@ -459,14 +473,14 @@
             this.dataGridView1.AllowUserToDeleteRows = false;
             this.dataGridView1.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("新細明體", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("新細明體", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView1.Location = new System.Drawing.Point(0, 0);
             this.dataGridView1.Name = "dataGridView1";
@@ -492,11 +506,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
-            this.splitContainer2.Panel1.PerformLayout();
             this.splitContainer2.Panel2.ResumeLayout(false);
             this.splitContainer2.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
 
@@ -538,5 +553,6 @@
         private System.Windows.Forms.Button CalendarBtn1;
         private System.Windows.Forms.TextBox EndEditDateTxt;
         private System.Windows.Forms.Button CalendarBtn;
+        private System.Windows.Forms.Panel panel1;
     }
 }

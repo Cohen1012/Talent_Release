@@ -203,7 +203,7 @@ namespace TalentWindowsFormsApp
         private void UpdateProjectExperience()
         {
             DataSet ds = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
-            if(!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+            if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
             {
                 MessageBox.Show("專案經驗載入失敗");
                 return;
@@ -430,189 +430,54 @@ namespace TalentWindowsFormsApp
                 }
 
                 ////程式語言
-                if (!string.IsNullOrEmpty(dr["Expertise_Language"].ToString().Trim()))
-                {
-                    languageTxt.Text = string.Empty;
-                    string[] expertiseLanguage = dr["Expertise_Language"].ToString().Trim().Split(',');
-                    for (int i = 0; i < expertiseLanguage.Length; i++)
-                    {
-                        for (int j = 0; j < languageCheckedListBox.Items.Count; j++)
-                        {
-                            if (languageCheckedListBox.Items[j].ToString() == expertiseLanguage[i])
-                            {
-                                languageCheckedListBox.SetItemChecked(j, true);
-                                break;
-                            }
-
-                            if (j == languageCheckedListBox.Items.Count - 1)
-                            {
-                                languageTxt.Text += expertiseLanguage[i] + ",";
-                            }
-                        }
-                    }
-
-                    languageTxt.Text = languageTxt.Text.EndsWith(",") ? languageTxt.Text.Remove(languageTxt.Text.Length - 1) : languageTxt.Text;
-                }
-
+                this.ChcekedExpertise(dr["Expertise_Language"].ToString().Trim(), languageCheckedListBox, languageTxt);
                 ////開發工具
-                if (!string.IsNullOrEmpty(dr["Expertise_Tools"].ToString().Trim()))
-                {
-                    ToolsTxt.Text = string.Empty;
-                    FramworkTxt.Text = string.Empty;
-                    string[] expertiseTools = dr["Expertise_Tools"].ToString().Trim().Split(',');
-                    for (int i = 0; i < expertiseTools.Length; i++)
-                    {
-                        for (int j = 0; j < ToolsCheckedListBox.Items.Count; j++)
-                        {
-                            if (ToolsCheckedListBox.Items[j].ToString() == expertiseTools[i])
-                            {
-                                ToolsCheckedListBox.SetItemChecked(j, true);
-                                break;
-                            }
-
-                            if (j == ToolsCheckedListBox.Items.Count - 1)
-                            {
-                                if (expertiseTools[i].StartsWith("Framwork："))
-                                {
-                                    FramworkTxt.Text += expertiseTools[i].Substring(9);
-                                }
-                                else
-                                {
-                                    ToolsTxt.Text += expertiseTools[i] + ",";
-                                }
-                            }
-                        }
-                    }
-
-                    ToolsTxt.Text = ToolsTxt.Text.EndsWith(",") ? ToolsTxt.Text.Remove(ToolsTxt.Text.Length - 1) : ToolsTxt.Text;
-                }
-
+                this.ChcekedExpertise(dr["Expertise_Tools"].ToString().Trim(), ToolsCheckedListBox, ToolsTxt);
+                FramworkTxt.Text = dr["Expertise_Tools_Framwork"].ToString().Trim();
                 ////Devops
-                if (!string.IsNullOrEmpty(dr["Expertise_Devops"].ToString().Trim()))
-                {
-                    DevopsTxt.Text = string.Empty;
-                    string[] DevopsLanguage = dr["Expertise_Devops"].ToString().Trim().Split(',');
-                    for (int i = 0; i < DevopsLanguage.Length; i++)
-                    {
-                        for (int j = 0; j < DevopsCheckedListBox.Items.Count; j++)
-                        {
-                            if (DevopsCheckedListBox.Items[j].ToString() == DevopsLanguage[i])
-                            {
-                                DevopsCheckedListBox.SetItemChecked(j, true);
-                                break;
-                            }
-
-                            if (j == DevopsCheckedListBox.Items.Count - 1)
-                            {
-                                DevopsTxt.Text += DevopsLanguage[i] + ",";
-                            }
-                        }
-                    }
-
-                    DevopsTxt.Text = DevopsTxt.Text.EndsWith(",") ? DevopsTxt.Text.Remove(DevopsTxt.Text.Length - 1) : DevopsTxt.Text;
-                }
-
+                this.ChcekedExpertise(dr["Expertise_Devops"].ToString().Trim(), DevopsCheckedListBox, DevopsTxt);               
                 ////作業系統
-                if (!string.IsNullOrEmpty(dr["Expertise_OS"].ToString().Trim()))
-                {
-                    OSTxt.Text = string.Empty;
-                    string[] OSLanguage = dr["Expertise_OS"].ToString().Trim().Split(',');
-                    for (int i = 0; i < OSLanguage.Length; i++)
-                    {
-                        for (int j = 0; j < OSCheckedListBox.Items.Count; j++)
-                        {
-                            if (OSCheckedListBox.Items[j].ToString() == OSLanguage[i])
-                            {
-                                OSCheckedListBox.SetItemChecked(j, true);
-                                break;
-                            }
-
-                            if (j == OSCheckedListBox.Items.Count - 1)
-                            {
-                                OSTxt.Text += OSLanguage[i] + ",";
-                            }
-                        }
-                    }
-
-                    OSTxt.Text = OSTxt.Text.EndsWith(",") ? OSTxt.Text.Remove(OSTxt.Text.Length - 1) : OSTxt.Text;
-                }
-
+                this.ChcekedExpertise(dr["Expertise_OS"].ToString().Trim(), OSCheckedListBox, OSTxt);               
                 ////大數據
-                if (!string.IsNullOrEmpty(dr["Expertise_BigData"].ToString().Trim()))
-                {
-                    BigDataTxt.Text = string.Empty;
-                    string[] expertiseBigData = dr["Expertise_BigData"].ToString().Trim().Split(',');
-                    for (int i = 0; i < expertiseBigData.Length; i++)
-                    {
-                        for (int j = 0; j < BigDataCheckedListBox.Items.Count; j++)
-                        {
-                            if (BigDataCheckedListBox.Items[j].ToString() == expertiseBigData[i])
-                            {
-                                BigDataCheckedListBox.SetItemChecked(j, true);
-                                break;
-                            }
-
-                            if (j == BigDataCheckedListBox.Items.Count - 1)
-                            {
-                                BigDataTxt.Text += expertiseBigData[i] + ",";
-                            }
-                        }
-                    }
-
-                    BigDataTxt.Text = BigDataTxt.Text.EndsWith(",") ? BigDataTxt.Text.Remove(BigDataTxt.Text.Length - 1) : BigDataTxt.Text;
-                }
-
+                this.ChcekedExpertise(dr["Expertise_BigData"].ToString().Trim(), BigDataCheckedListBox, BigDataTxt);
                 ////資料庫
-                if (!string.IsNullOrEmpty(dr["Expertise_DataBase"].ToString().Trim()))
-                {
-                    DataBaseTxt.Text = string.Empty;
-                    string[] expertiseDataBase = dr["Expertise_DataBase"].ToString().Trim().Split(',');
-                    for (int i = 0; i < expertiseDataBase.Length; i++)
-                    {
-                        for (int j = 0; j < DataBaseCheckedListBox.Items.Count; j++)
-                        {
-                            if (DataBaseCheckedListBox.Items[j].ToString() == expertiseDataBase[i])
-                            {
-                                DataBaseCheckedListBox.SetItemChecked(j, true);
-                                break;
-                            }
-
-                            if (j == DataBaseCheckedListBox.Items.Count - 1)
-                            {
-                                DataBaseTxt.Text += expertiseDataBase[i] + ",";
-                            }
-                        }
-                    }
-
-                    DataBaseTxt.Text = DataBaseTxt.Text.EndsWith(",") ? DataBaseTxt.Text.Remove(DataBaseTxt.Text.Length - 1) : DataBaseTxt.Text;
-                }
-
+                this.ChcekedExpertise(dr["Expertise_DataBase"].ToString().Trim(), DataBaseCheckedListBox, DataBaseTxt);               
                 ////專業認證
-                if (!string.IsNullOrEmpty(dr["Expertise_Certification"].ToString().Trim()))
-                {
-                    CertificationTxt.Text = string.Empty;
-                    string[] expertiseCertification = dr["Expertise_Certification"].ToString().Trim().Split(',');
-                    for (int i = 0; i < expertiseCertification.Length; i++)
-                    {
-                        for (int j = 0; j < CertificationCheckedListBox.Items.Count; j++)
-                        {
-                            if (CertificationCheckedListBox.Items[j].ToString() == expertiseCertification[i])
-                            {
-                                CertificationCheckedListBox.SetItemChecked(j, true);
-                                break;
-                            }
+                this.ChcekedExpertise(dr["Expertise_Certification"].ToString().Trim(), CertificationCheckedListBox, CertificationTxt);
+                PaitDataGridView();
+            }
+        }
 
-                            if (j == CertificationCheckedListBox.Items.Count - 1)
-                            {
-                                CertificationTxt.Text += expertiseCertification[i] + ",";
-                            }
+        /// <summary>
+        /// 勾選專長
+        /// </summary>
+        /// <param name="expertiseList">專長字串以","隔開</param>
+        /// <param name="expertiseCheckedListBox">專長的CheckedListBox物件</param>
+        /// <param name="expertiseText">專長的其他欄位</param>
+        private void ChcekedExpertise(string expertiseList, CheckedListBox expertiseCheckedListBox,TextBox expertiseText)
+        {
+            if (!string.IsNullOrEmpty(expertiseList))
+            {
+                expertiseText.Text = string.Empty;
+                string[] expertise = expertiseList.Split(',');
+                for (int i = 0; i < expertise.Length; i++)
+                {
+                    for (int j = 0; j < expertiseCheckedListBox.Items.Count; j++)
+                    {
+                        if (expertiseCheckedListBox.Items[j].ToString() == expertise[i])
+                        {
+                            expertiseCheckedListBox.SetItemChecked(j, true);
+                            break;
+                        }
+
+                        if (j == expertiseCheckedListBox.Items.Count - 1)
+                        {
+                            expertiseText.Text += expertise[i] + ",";
                         }
                     }
-
-                    CertificationTxt.Text = CertificationTxt.Text.EndsWith(",") ? CertificationTxt.Text.Remove(CertificationTxt.Text.Length - 1) : CertificationTxt.Text;
                 }
 
-                PaitDataGridView();
+                expertiseText.Text = expertiseText.Text.RemoveEndWithDelimiter(",");
             }
         }
 
@@ -1052,8 +917,8 @@ namespace TalentWindowsFormsApp
         /// <summary>
         /// 將專長CheckBox串成字串
         /// </summary>
-        /// <param name="checkedListBox"></param>
-        /// <param name="expertiseTxt"></param>
+        /// <param name="checkedListBox">checkedListBox物件</param>
+        /// <param name="expertiseTxt">專長的其他欄位</param>
         /// <returns></returns>
         private string GetExpertise(CheckedListBox checkedListBox, string expertiseTxt)
         {
@@ -1067,10 +932,8 @@ namespace TalentWindowsFormsApp
             }
 
             expertise += expertiseTxt;
-            if (expertise.EndsWith(","))
-            {
-                expertise = expertise.Remove(expertise.Length - 1);
-            }
+
+            expertise = expertise.RemoveEndWithDelimiter(",");
 
             return expertise;
         }
@@ -1117,35 +980,28 @@ namespace TalentWindowsFormsApp
                 Hope_Promise = HopePromiseTxt.Text,
                 Introduction = IntroductionTxt.Text,
                 ////程式語言
-                Expertise_Language = GetExpertise(languageCheckedListBox, languageTxt.Text),
+                Expertise_Language = this.GetExpertise(languageCheckedListBox, languageTxt.Text),
                 ////開發工具
-                Expertise_Tools = GetExpertise(ToolsCheckedListBox, ToolsTxt.Text)
+                Expertise_Tools = this.GetExpertise(ToolsCheckedListBox, ToolsTxt.Text),
+                ////開發工具-Framwork
+                Expertise_Tools_Framwork = FramworkTxt.Text,
+                ////Devops
+                Expertise_Devops = this.GetExpertise(DevopsCheckedListBox, DevopsTxt.Text),
+                ////作業系統
+                Expertise_OS = this.GetExpertise(OSCheckedListBox, OSTxt.Text),
+                ////大數據
+                Expertise_BigData = this.GetExpertise(BigDataCheckedListBox, BigDataTxt.Text),
+                ////資料庫
+                Expertise_DataBase = this.GetExpertise(DataBaseCheckedListBox, DataBaseTxt.Text),
+                ////專業認證
+                Expertise_Certification = this.GetExpertise(CertificationCheckedListBox, CertificationTxt.Text)
             };
+            ////教育程度
             interviewInfoUI.Education = interviewInfoUI.Education == "[]" ? string.Empty : interviewInfoUI.Education;
+            ////工作經歷
             interviewInfoUI.Work_Experience = interviewInfoUI.Work_Experience == "[]" ? string.Empty : interviewInfoUI.Work_Experience;
-            interviewInfoUI.Language = interviewInfoUI.Language == "[]" ? string.Empty : interviewInfoUI.Language;
-            if (FramworkTxt.Text != string.Empty)
-            {
-                if (interviewInfoUI.Expertise_Tools == string.Empty)
-                {
-                    interviewInfoUI.Expertise_Tools += "Framwork：" + FramworkTxt.Text;
-                }
-                else
-                {
-                    interviewInfoUI.Expertise_Tools += ",Framwork：" + FramworkTxt.Text;
-                }
-            }
-
-            ////Devops
-            interviewInfoUI.Expertise_Devops = GetExpertise(DevopsCheckedListBox, DevopsTxt.Text);
-            ////作業系統
-            interviewInfoUI.Expertise_OS = GetExpertise(OSCheckedListBox, OSTxt.Text);
-            ////大數據
-            interviewInfoUI.Expertise_BigData = GetExpertise(BigDataCheckedListBox, BigDataTxt.Text);
-            ////資料庫
-            interviewInfoUI.Expertise_DataBase = GetExpertise(DataBaseCheckedListBox, DataBaseTxt.Text);
-            ////專業認證
-            interviewInfoUI.Expertise_Certification = GetExpertise(CertificationCheckedListBox, CertificationTxt.Text);
+            ////語言能力
+            interviewInfoUI.Language = interviewInfoUI.Language == "[]" ? string.Empty : interviewInfoUI.Language;           
 
             return interviewInfoUI;
         }
@@ -1849,10 +1705,10 @@ namespace TalentWindowsFormsApp
                         attachedFilesMode = "InterviewInfo";
                         break;
                     }
-            }            
+            }
 
             Files files = new Files(Interview_Id, attachedFilesMode);
-            if(files.ShowDialog() == DialogResult.OK)
+            if (files.ShowDialog() == DialogResult.OK)
             {
                 this.UpdateTimeClick(e);
                 files.Close();

@@ -923,14 +923,14 @@ namespace TalentClassLibrary
 
             string interviewId = string.Empty;
             string insert = @"insert into Interview_Info ([Vacancies],[Interview_Date],[Contact_Id],[Name],[Sex],[Birthday],[Married],[Mail]
-                              ,[Adress],[CellPhone],[Expertise_Language],[Expertise_Tools],[Expertise_Devops],[Expertise_OS]
+                              ,[Adress],[CellPhone],[Expertise_Language],[Expertise_Tools],[Expertise_Tools_Framwork],[Expertise_Devops],[Expertise_OS]
                               ,[Expertise_BigData],[Expertise_DataBase],[Expertise_Certification],[IsStudy],[IsService],[Relatives_Relationship]
                               ,[Relatives_Name],[Care_Work],[Hope_Salary],[When_Report],[Advantage],[Disadvantages],[Hobby],[Attract_Reason]
                               ,[Future_Goal],[Hope_Supervisor],[Hope_Promise],[Introduction],[During_Service]
                               ,[Exemption_Reason],[Urgent_Contact_Person],[Urgent_Relationship],[Urgent_CellPhone],[Education],[Language],[Work_Experience])
                                output inserted.Interview_Id values 
                               (@vacancies,@interviewDate,@contactId,@name,@sex,@birthday,@married,@mail,@adress,@cellPhone,@expertiseLanguage
-                              ,@expertiseTools,@expertiseDevops,@expertiseOS,@expertiseBigData,@expertiseDataBase,@expertiseCertification
+                              ,@expertiseTools,@expertiseToolsFramwork,@expertiseDevops,@expertiseOS,@expertiseBigData,@expertiseDataBase,@expertiseCertification
                               ,@isStudy,@IsService,@relativesRelationship,@relativesName,@careWork,@hopeSalary,@whenReport,@advantage
                               ,@disadvantages,@hobby,@attractReason,@futureGoal,@hopeSupervisor,@hopePromise,@introduction,@duringService
                               ,@exemptionReason,@urgentContactPerson,@urgentRelationship,@urgentCellPhone,@education,@language,@workExperience)";
@@ -971,6 +971,7 @@ namespace TalentClassLibrary
                         cmd.Parameters.Add("@expertiseOS", SqlDbType.NVarChar).Value = dr["Expertise_OS"].ToString();
                         cmd.Parameters.Add("@expertiseDevops", SqlDbType.NVarChar).Value = dr["Expertise_Devops"].ToString();
                         cmd.Parameters.Add("@expertiseTools", SqlDbType.NVarChar).Value = dr["Expertise_Tools"].ToString();
+                        cmd.Parameters.Add("@expertiseToolsFramwork", SqlDbType.NVarChar).Value = dr["Expertise_Tools_Framwork"].ToString();
                         cmd.Parameters.Add("@expertiseLanguage", SqlDbType.NVarChar).Value = dr["Expertise_language"].ToString();
                         cmd.Parameters.Add("@interviewDate", SqlDbType.Date).Value = dr["Interview_Date"].ToString();
                         cmd.Parameters.Add("@contactId", SqlDbType.Int).Value = contactId;
@@ -2109,7 +2110,7 @@ namespace TalentClassLibrary
             ErrorMessage = string.Empty;
             DataSet ds = new DataSet();
             string SQLStr = @"select [Vacancies],CONVERT(varchar(100), Interview_Date, 111)Interview_Date,[Name],[Sex],CONVERT(varchar(100), [Birthday], 111) Birthday,[Married],[Mail],[Adress],[CellPhone],[Image]
-                                    ,[Expertise_Language],[Expertise_Tools],[Expertise_Devops],[Expertise_OS],[Expertise_BigData],[Expertise_DataBase]
+                                    ,[Expertise_Language],[Expertise_Tools],[Expertise_Tools_Framwork],[Expertise_Devops],[Expertise_OS],[Expertise_BigData],[Expertise_DataBase]
                                     ,[Expertise_Certification],[IsStudy],[IsService],[Relatives_Relationship],[Relatives_Name],[Care_Work],[Hope_Salary]
                                     ,[When_Report],[Advantage],[Disadvantages],[Hobby],[Attract_Reason],[Future_Goal],[Hope_Supervisor]
                                     ,[Hope_Promise],[Introduction],[During_Service],[Exemption_Reason],[Urgent_Contact_Person],[Urgent_Relationship]
@@ -2617,7 +2618,8 @@ namespace TalentClassLibrary
 
             string update = @"update Interview_Info set Vacancies=@vacancies,Interview_Date=@interviewDate,Name=@name,Sex=@sex,Birthday=@birthday
                               ,Married=@married,Mail=@mail,Adress=@adress,CellPhone=@cellPhone,Image=@image,Expertise_Language=@expertiseLanguage
-                              ,Expertise_Tools=@expertiseTools,Expertise_Devops=@expertiseDevops,Expertise_OS=@expertiseOS
+                              ,Expertise_Tools=@expertiseTools,Expertise_Tools_Framwork=@expertiseToolsFramwork,Expertise_Devops=@expertiseDevops
+                              ,Expertise_OS=@expertiseOS
                               ,Expertise_BigData=@expertiseBigData,Expertise_DataBase=@expertiseDataBase,Expertise_Certification=@expertiseCertification
                               ,IsStudy=@isStudy,IsService=@IsService,Relatives_Relationship=@relativesRelationship,Relatives_Name=@relativesName
                               ,Care_Work=@careWork,Hope_Salary=@hopeSalary,When_Report=@whenReport,Advantage=@advantage,Disadvantages=@disadvantages
@@ -2663,6 +2665,7 @@ namespace TalentClassLibrary
                         cmd.Parameters.Add("@expertiseOS", SqlDbType.NVarChar).Value = dr["Expertise_OS"].ToString().Trim();
                         cmd.Parameters.Add("@expertiseDevops", SqlDbType.NVarChar).Value = dr["Expertise_Devops"].ToString().Trim();
                         cmd.Parameters.Add("@expertiseTools", SqlDbType.NVarChar).Value = dr["Expertise_Tools"].ToString().Trim();
+                        cmd.Parameters.Add("@expertiseToolsFramwork", SqlDbType.NVarChar).Value = dr["Expertise_Tools_Framwork"].ToString().Trim();
                         cmd.Parameters.Add("@expertiseLanguage", SqlDbType.NVarChar).Value = dr["Expertise_language"].ToString().Trim();
                         cmd.Parameters.Add("@image", SqlDbType.NVarChar).Value = path.Trim();
                         cmd.Parameters.Add("@interviewDate", SqlDbType.Date).Value = dr["Interview_Date"].ToString().Trim();
@@ -3266,19 +3269,7 @@ namespace TalentClassLibrary
             if (validMsg != string.Empty)
             {
                 msg += validMsg + "\n";
-            }
-
-            validMsg = Valid.GetInstance().ValidMailFormat(mail);
-            if (validMsg != string.Empty)
-            {
-                msg += validMsg + "\n";
-            }
-
-            validMsg = Valid.GetInstance().ValidCellPhoneFormat(cellPhone);
-            if (validMsg != string.Empty)
-            {
-                msg += validMsg + "\n";
-            }
+            }           
 
             if (!string.IsNullOrEmpty(string.Empty))
             {

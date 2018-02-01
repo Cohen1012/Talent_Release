@@ -26,14 +26,14 @@ namespace TalentWindowsFormsApp
         {
             X = this.Width;//獲取窗體的寬度
             Y = this.Height;//獲取窗體的高度
-                            //Talent.GetInstance().SetTag(this);//調用方法
+            //Talent.GetInstance().SetTag(this);//調用方法
         }
 
         private void SignIn_Resize(object sender, EventArgs e)
         {
             float newx = (this.Width) / X; //窗體寬度縮放比例
             float newy = (this.Height) / Y;//窗體高度縮放比例
-                                           // Talent.GetInstance().SetControls(newx, newy, this);//隨窗體改變控制項大小
+            // Talent.GetInstance().SetControls(newx, newy, this);//隨窗體改變控制項大小
         }
 
         /// <summary>

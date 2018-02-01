@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.NewInterviewBtn = new System.Windows.Forms.Button();
             this.UpdateTimeLbl = new System.Windows.Forms.Label();
@@ -94,6 +94,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.AutoScroll = true;
             this.splitContainer1.Panel1.Controls.Add(this.NewInterviewBtn);
             this.splitContainer1.Panel1.Controls.Add(this.UpdateTimeLbl);
             this.splitContainer1.Panel1.Controls.Add(this.ImportLink);
@@ -122,7 +123,7 @@
             // 
             this.UpdateTimeLbl.AutoSize = true;
             this.UpdateTimeLbl.Font = new System.Drawing.Font("新細明體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.UpdateTimeLbl.Location = new System.Drawing.Point(1184, 41);
+            this.UpdateTimeLbl.Location = new System.Drawing.Point(580, 51);
             this.UpdateTimeLbl.Name = "UpdateTimeLbl";
             this.UpdateTimeLbl.Size = new System.Drawing.Size(62, 19);
             this.UpdateTimeLbl.TabIndex = 3;
@@ -132,7 +133,7 @@
             // 
             this.ImportLink.AutoSize = true;
             this.ImportLink.Font = new System.Drawing.Font("新細明體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.ImportLink.Location = new System.Drawing.Point(1358, 19);
+            this.ImportLink.Location = new System.Drawing.Point(754, 29);
             this.ImportLink.Name = "ImportLink";
             this.ImportLink.Size = new System.Drawing.Size(47, 19);
             this.ImportLink.TabIndex = 2;
@@ -144,7 +145,7 @@
             this.ExportLink.AutoSize = true;
             this.ExportLink.Font = new System.Drawing.Font("新細明體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.ExportLink.ForeColor = System.Drawing.Color.Coral;
-            this.ExportLink.Location = new System.Drawing.Point(1305, 19);
+            this.ExportLink.Location = new System.Drawing.Point(701, 29);
             this.ExportLink.Name = "ExportLink";
             this.ExportLink.Size = new System.Drawing.Size(47, 19);
             this.ExportLink.TabIndex = 1;
@@ -159,7 +160,7 @@
             "聯繫狀況",
             "面談資料",
             "所有資料"});
-            this.ExportCombo.Location = new System.Drawing.Point(1178, 18);
+            this.ExportCombo.Location = new System.Drawing.Point(574, 28);
             this.ExportCombo.Name = "ExportCombo";
             this.ExportCombo.Size = new System.Drawing.Size(121, 20);
             this.ExportCombo.TabIndex = 0;
@@ -486,14 +487,14 @@
             this.dataGridView1.AllowUserToDeleteRows = false;
             this.dataGridView1.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCells;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.ScrollBar;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("新細明體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.ScrollBar;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("新細明體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView1.Location = new System.Drawing.Point(0, 0);
             this.dataGridView1.Name = "dataGridView1";
@@ -519,7 +520,7 @@
             this.ContactStausCombo.Font = new System.Drawing.Font("新細明體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.ContactStausCombo.FormattingEnabled = true;
             this.ContactStausCombo.Items.AddRange(new object[] {
-            "--請選擇--",
+            "(無)",
             "人才儲存",
             "1111邀約",
             "104邀約",
