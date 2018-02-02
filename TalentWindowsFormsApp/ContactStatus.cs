@@ -98,8 +98,8 @@ namespace TalentWindowsFormsApp
         {
             InitializeComponent();
             Contact_Id = contactId;
-            ShowData();
-            PaitDataGridView();
+            //ShowData();
+            //PaitDataGridView();
         }
 
         /// <summary>
@@ -298,24 +298,26 @@ namespace TalentWindowsFormsApp
             }
         }
 
+        /// <summary>
+        /// 第一次載入表單時執行
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ContactStatus_Shown(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(Contact_Id))
+            {
+                ShowData();
+                PaitDataGridView();
+            }
+        }
+
         private void ContactStatus_Load(object sender, EventArgs e)
         {
             dateTimePicker1.Format = DateTimePickerFormat.Custom;
             dateTimePicker1.CustomFormat = "yyyy/MM/dd";
             ExportCombo.SelectedItem = "聯繫狀況";
             this.CreateColumns();
-
-            if (!string.IsNullOrEmpty(Contact_Id))
-            {
-                ContactInfoDB.Clear();
-                CodeDB.Clear();
-                CodeTxt.Clear();
-                DelCode.Clear();
-                ContactStatusDB.Clear();
-                ContactStatusUI.Clear();
-                ShowData();
-                PaitDataGridView();
-            }
         }
 
         /// <summary>

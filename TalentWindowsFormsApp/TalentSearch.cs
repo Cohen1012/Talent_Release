@@ -27,9 +27,6 @@ namespace TalentWindowsFormsApp
             IsInterviewCombo.SelectedItem = "不限";
             InterviewResultCombo.SelectedItem = "不限";
             ExportCombo.SelectedItem = "聯繫狀況";
-
-            DataTable dt = TalentClassLibrary.TalentSearch.GetInstance().SelectTop15();
-            ShowData(ref dt);
         }
 
         private void SearchBtn_Click(object sender, EventArgs e)
@@ -65,6 +62,8 @@ namespace TalentWindowsFormsApp
             if (dt.Rows.Count == 0)
             {
                 MessageBox.Show("沒有符合的資料", "訊息");
+                dataGridView1.Columns.Clear();
+                dataGridView1.DataSource = null;
                 return;
             }
 
@@ -175,6 +174,20 @@ namespace TalentWindowsFormsApp
             };
             dataGridView1.Columns.Add(DelAccount);
             dataGridView1.Columns[0].Visible = false;
+
+            for (int i = 0; i < dataGridView1.RowCount; i++)
+            {
+                do
+                {
+                    dataGridView1.Rows[i].DefaultCellStyle.BackColor = Color.LightSeaGreen;
+                    i++;
+                    if (i >= dataGridView1.RowCount)
+                    {
+                        break;
+                    }
+
+                } while (string.IsNullOrEmpty(dataGridView1.Rows[i].Cells[0].Value.ToString()));
+            }
         }
 
         private void CalendarBtn_Click(object sender, EventArgs e)
@@ -324,9 +337,15 @@ namespace TalentWindowsFormsApp
             }
         }
 
-        private void ExportCombo_SelectedIndexChanged(object sender, EventArgs e)
+        /// <summary>
+        /// 第一次載入表單時執行
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TalentSearch_Shown(object sender, EventArgs e)
         {
-
+            DataTable dt = TalentClassLibrary.TalentSearch.GetInstance().SelectTop15();
+            ShowData(ref dt);
         }
     }
 }

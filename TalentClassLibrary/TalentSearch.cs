@@ -302,14 +302,16 @@ namespace TalentClassLibrary
 
                 if(i == 0)
                 {
-                    da.SelectCommand.CommandText += @"and Name like @word" + (i + 1) + " or Code_Id like @word" + (i + 1);
+                    da.SelectCommand.CommandText += @" and (Name like @word" + (i + 1) + " or Code_Id like @word" + (i + 1) + " or Remarks like @word" + (i + 1);
                     da.SelectCommand.Parameters.Add("@word" + (i + 1), SqlDbType.NVarChar).Value = "%" + keyWord[i] + "%";
                 }
                 else
                 {
-                    da.SelectCommand.CommandText += @" or Name like @word" + (i + 1) + " or Code_Id like @word" + (i + 1);
+                    da.SelectCommand.CommandText += @" or Name like @word" + (i + 1) + " or Code_Id like @word" + (i + 1) + " or Remarks like @word" + (i + 1);
                     da.SelectCommand.Parameters.Add("@word" + (i + 1), SqlDbType.NVarChar).Value = "%" + keyWord[i] + "%";
                 }
+
+                da.SelectCommand.CommandText += ")";
             }
 
             return da;
