@@ -1051,7 +1051,7 @@ namespace TalentClassLibrary
                         cmd.Parameters.Add("@name", SqlDbType.NVarChar).Value = dr["Name"].ToString();
                         cmd.Parameters.Add("@sex", SqlDbType.NVarChar).Value = dr["Sex"].ToString();
                         cmd.Parameters.Add("@mail", SqlDbType.VarChar).Value = dr["Mail"].ToString();
-                        cmd.Parameters.Add("@cellPhone", SqlDbType.Char).Value = dr["CellPhone"].ToString();
+                        cmd.Parameters.Add("@cellPhone", SqlDbType.VarChar).Value = dr["CellPhone"].ToString();
                         cmd.Parameters.Add("@updateTime", SqlDbType.DateTime).Value = DateTime.Now.ToString();
                         cmd.Parameters.Add("@cooperationMode", SqlDbType.NVarChar).Value = dr["Cooperation_Mode"].ToString();
                         cmd.Parameters.Add("@status", SqlDbType.NVarChar).Value = dr["Status"].ToString();

@@ -50,6 +50,10 @@ namespace TalentWindowsFormsApp
             DescriptionTxt.Text = project.Description;
         }
 
+        /// <summary>
+        /// 取得專案經驗的資料
+        /// </summary>
+        /// <returns></returns>
         public ProjectExperience GetProjectExperience()
         {
             ProjectExperience project = new ProjectExperience

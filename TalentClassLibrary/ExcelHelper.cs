@@ -25,6 +25,11 @@ namespace TalentClassLibrary
         public static ExcelHelper GetInstance() => excelHelper;
 
         /// <summary>
+        /// 紀錄大略發生的錯誤
+        /// </summary>
+        public string ErrorMessage { get; set; }
+
+        /// <summary>
         /// 匯出多筆聯繫狀況資料
         /// </summary>
         /// <param name="ContactSituationList"></param>
@@ -179,7 +184,100 @@ namespace TalentClassLibrary
             }
         }
 
-        public void ImportOldTalent(string path)
+        /// <summary>
+        /// 匯入舊版資料
+        /// </summary>
+        /// <param name="path"></param>
+        public List<ContactSituation> ImportOldTalent(string path)
+        {
+            ErrorMessage = string.Empty;
+            List<ContactSituation> contactSituationList = new List<ContactSituation>();
+            try
+            {
+                Workbook workbook = new Workbook();
+                workbook.LoadFromFile(path);
+                Worksheet sheet = workbook.Worksheets[0];
+                DataTable dt = sheet.ExportDataTable();
+                if(dt.Rows.Count == 0)
+                {
+                    ErrorMessage = "空的excel";
+                    return contactSituationList;
+                }
+
+                foreach (DataRow dr in dt.Rows)
+                {
+                    ContactSituation contactSituation = new ContactSituation();
+                    ContactInfo contactInfo = new ContactInfo();
+                    ContactStatus contactStatus = new ContactStatus();
+                    for (int i = 0; i < 10; i++)
+                    {
+                        switch (dt.Columns[i].ToString().Trim())
+                        {
+                            case "姓名":
+                                contactInfo.Name = dr[i].ToString().Trim();
+                                break;
+                            case "性別":
+                                contactInfo.Sex = dr[i].ToString().Trim();
+                                break;
+                            case "手機":
+                                contactInfo.CellPhone = dr[i].ToString().Trim();
+                                break;
+                            case "郵件":
+                                contactInfo.Mail = dr[i].ToString().Trim();
+                                break;
+                            case "學校":
+                                if (!string.IsNullOrEmpty(dr[i].ToString().Trim()))
+                                {
+                                    contactStatus.Remarks += "學校\n" + dr[i].ToString().Trim() + "\n";
+                                }
+
+                                break;
+                            case "地區":
+                                contactInfo.Place = dr[i].ToString().Trim();
+                                break;
+                            case "最後編輯時間":
+                                contactStatus.Contact_Date = dr[i].ToString().Trim();
+                                break;
+                            case "專長":
+                                contactInfo.Skill = dr[i].ToString().Trim();
+                                break;
+                            case "互動":
+                                if (!string.IsNullOrEmpty(dr[i].ToString().Trim()))
+                                {
+                                    contactStatus.Remarks += "互動\n" + dr[i].ToString().Trim() + "\n";
+                                }
+
+                                break;
+                            case "評價":
+                                if (!string.IsNullOrEmpty(dr[i].ToString().Trim()))
+                                {
+                                    contactStatus.Remarks += "評價\n" + dr[i].ToString().Trim() + "\n";
+                                }
+
+                                break;
+                        }
+                    }
+                    contactSituation.Info = contactInfo;
+                    contactSituation.Status = new List<ContactStatus> { contactStatus };
+                    contactSituationList.Add(contactSituation);
+                }
+
+                return contactSituationList;
+            }
+            catch (Exception ex)
+            {
+                LogInfo.WriteErrorInfo(ex);
+                contactSituationList.Clear();
+                ErrorMessage = "讀取Excel發生錯誤";
+                return contactSituationList;
+            }
+        }
+
+        /// <summary>
+        /// 匯入新版資料
+        /// </summary>
+        /// <param name="path"></param>
+        public void ImportNewTalent(string path)
         {
             List<ContactSituation> contactSituationList = new List<ContactSituation>();
             try
@@ -197,7 +295,7 @@ namespace TalentClassLibrary
                     ////先不處理聯繫狀況
                     for (int j = 0; j < 29; j++)
                     {
-                        if(j==3 || j==4 || j== 5)
+                        if (j == 3 || j == 4 || j == 5)
                         {
                             continue;
                         }
@@ -449,35 +547,6 @@ namespace TalentClassLibrary
             sheet.Range["L" + row + ":O" + row].Style.Borders[BordersLineType.EdgeBottom].LineStyle = LineStyleType.Double;
             sheet.Range[row, 12].Style.HorizontalAlignment = HorizontalAlignType.Left;
             ChcekedExpertise(interviewInfo.Expertise_Tools, sheet, row, Expertise_Tools, 12);
-            //if (!string.IsNullOrEmpty(interviewInfo.Expertise_Tools))
-            //{
-            //    string[] expertiseTools = interviewInfo.Expertise_Tools.Split(',');
-            //    for (int i = 0; i < expertiseTools.Length; i++)
-            //    {
-            //        for (int j = 0; j < Expertise_Tools.Length; j++)
-            //        {
-            //            if (Expertise_Tools[j] == expertiseTools[i])
-            //            {
-            //                sheet.Range[row, (j + 5)].Text = "■" + Expertise_Tools[j];
-            //                break;
-            //            }
-
-            //            if (j == Expertise_Tools.Length - 1)
-            //            {
-            //                if (expertiseTools[i].StartsWith("Framwork："))
-            //                {
-            //                    sheet.Range[row, 9].Text += expertiseTools[i].Substring(9);
-            //                }
-            //                else
-            //                {
-            //                    sheet.Range[row, 12].Text += expertiseTools[i] + ",";
-            //                }
-            //            }
-            //        }
-            //    }
-
-            //    sheet.Range[row, 12].Text = this.RemoveEndWithComma(sheet.Range[row, 12].Text);
-            //}
             ////----Devops
             row += 2;
             sheet.Range[row, 4].Text = "Devops";

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TalentClassLibrary;
+using TalentClassLibrary.Model;
 using ShareClassLibrary;
 
 namespace TalentWindowsFormsApp
@@ -333,7 +334,14 @@ namespace TalentWindowsFormsApp
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
+                List<ContactSituation> contactSituationList = ExcelHelper.GetInstance().ImportOldTalent(ofd.FileName);
+                if(!string.IsNullOrEmpty(ExcelHelper.GetInstance().ErrorMessage))
+                {
+                    MessageBox.Show(ExcelHelper.GetInstance().ErrorMessage);
+                    return;
+                }
 
+                MessageBox.Show(TalentClassLibrary.TalentSearch.GetInstance().InsertContactSituationInfoData(contactSituationList));
             }
         }
 

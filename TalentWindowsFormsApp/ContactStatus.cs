@@ -98,8 +98,6 @@ namespace TalentWindowsFormsApp
         {
             InitializeComponent();
             Contact_Id = contactId;
-            //ShowData();
-            //PaitDataGridView();
         }
 
         /// <summary>

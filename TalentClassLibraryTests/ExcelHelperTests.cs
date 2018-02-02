@@ -43,9 +43,16 @@ namespace TalentClassLibrary.Tests
         }
 
         [TestMethod()]
-        public void ImportOldTalentTest()
+        public void ImportNewTalentTest()
         {
             var input = @"..\..\..\Template\匯入資料範本(google duc).xlsx";
+            ExcelHelper.GetInstance().ImportNewTalent(input);
+        }
+
+        [TestMethod()]
+        public void ImportOldTalentTest()
+        {
+            var input = @"..\..\..\Template\匯入資料範本(人資系統).xlsx";
             ExcelHelper.GetInstance().ImportOldTalent(input);
         }
     }

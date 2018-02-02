@@ -23,6 +23,65 @@ namespace TalentClassLibrary
         /// </summary>
         public string ErrorMessage { get; set; }
 
+        public string InsertContactSituationInfoData(List<ContactSituation> contactSituationList)
+        {
+            int i = 1;
+            string contact_Id = string.Empty;
+            string insert = string.Empty;
+            try
+            {
+                using (SqlCommand cmd = new SqlCommand(insert, ScConnection, StTransaction))
+                {
+                    foreach (ContactSituation contactSituation in contactSituationList)
+                    {
+                        cmd.CommandText = @"insert into Contact_Info ([Name],[Sex],[Mail],[CellPhone],[UpdateTime],[Cooperation_Mode],[Status],[Place],[Skill],[Year])
+                              output inserted.Contact_Id
+                              values(@name,@sex,@mail,@cellPhone,GETDATE(),@cooperationMode,@status,@place,@skill,@year)";
+                        cmd.Parameters.Clear();
+                        ////新增聯繫資料
+                        cmd.Parameters.Add("@name", SqlDbType.NVarChar).Value = contactSituation.Info.Name ?? string.Empty;
+                        cmd.Parameters.Add("@sex", SqlDbType.NVarChar).Value = contactSituation.Info.Sex ?? string.Empty;
+                        cmd.Parameters.Add("@mail", SqlDbType.VarChar).Value = contactSituation.Info.Mail ?? string.Empty;
+                        cmd.Parameters.Add("@cellPhone", SqlDbType.VarChar).Value = contactSituation.Info.CellPhone ?? string.Empty;
+                        cmd.Parameters.Add("@cooperationMode", SqlDbType.NVarChar).Value = "皆可";
+                        cmd.Parameters.Add("@status", SqlDbType.NVarChar).Value = string.Empty;
+                        cmd.Parameters.Add("@place", SqlDbType.NVarChar).Value = contactSituation.Info.Place ?? string.Empty;
+                        cmd.Parameters.Add("@skill", SqlDbType.NVarChar).Value = contactSituation.Info.Skill ?? string.Empty;
+                        cmd.Parameters.Add("@year", SqlDbType.VarChar).Value = string.Empty;
+                        contact_Id = cmd.ExecuteScalar().ToString();
+                        ////新增聯繫狀況
+                        cmd.CommandText = @"insert into Contact_Situation (Contact_Status,Remarks,Contact_Date,Contact_Id)
+                                        values (@Contact_Status,@Remarks,@Contact_Date,@Contact_Id)";
+                        foreach(ContactStatus contactstatus in contactSituation.Status)
+                        {
+                            cmd.Parameters.Clear();
+                            cmd.Parameters.Add(@"Contact_Status", SqlDbType.NVarChar).Value = "人資系統資料";
+                            cmd.Parameters.Add(@"Remarks", SqlDbType.NVarChar).Value = contactstatus.Remarks ?? string.Empty;
+                            cmd.Parameters.Add(@"Contact_Date", SqlDbType.DateTime).Value = string.IsNullOrEmpty(contactstatus.Contact_Date)? "2000/1/1": contactstatus.Contact_Date;
+                            cmd.Parameters.Add(@"Contact_Id", SqlDbType.Int).Value = contact_Id;
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        i++;
+                    }
+
+                    this.CommitTransaction();
+                    return "匯入成功";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(i.ToString());
+                LogInfo.WriteErrorInfo(ex);
+                this.RollbackTransaction();
+                return "匯入失敗";
+            }
+            finally
+            {
+                this.CloseDatabaseConnection();
+            }
+        }
+
         /// <summary>
         /// 進入查詢頁面時，顯示最新(依造最後編輯日降冪排序)的15筆資料
         /// </summary>
