@@ -139,6 +139,7 @@
             this.ImportLink.TabIndex = 2;
             this.ImportLink.TabStop = true;
             this.ImportLink.Text = "匯入";
+            this.ImportLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ImportLink_LinkClicked);
             // 
             // ExportLink
             // 

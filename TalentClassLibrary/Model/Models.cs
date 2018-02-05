@@ -32,10 +32,25 @@ namespace TalentClassLibrary.Model
     /// </summary>
     public class Education
     {
+        /// <summary>
+        /// 學校名稱
+        /// </summary>
         public string School { get; set; }
+        /// <summary>
+        /// 科系
+        /// </summary>
         public string Department { get; set; }
+        /// <summary>
+        /// 起迄年月
+        /// </summary>
         public string Start_End_Date { get; set; }
+        /// <summary>
+        /// 畢/肄業
+        /// </summary>
         public string Is_Graduation { get; set; }
+        /// <summary>
+        /// 備註
+        /// </summary>
         public string Remark { get; set; }
     }
 
@@ -44,10 +59,25 @@ namespace TalentClassLibrary.Model
     /// </summary>
     public class Language
     {
+        /// <summary>
+        /// 語言
+        /// </summary>
         public string Language_Name { get; set; }
+        /// <summary>
+        /// 聽
+        /// </summary>
         public string Listen { get; set; }
+        /// <summary>
+        /// 說
+        /// </summary>
         public string Speak { get; set; }
+        /// <summary>
+        /// 讀
+        /// </summary>
         public string Read { get; set; }
+        /// <summary>
+        /// 寫
+        /// </summary>
         public string Write { get; set; }
     }
 
@@ -56,11 +86,29 @@ namespace TalentClassLibrary.Model
     /// </summary>
     public class WorkExperience
     {
+        /// <summary>
+        /// 機構名稱
+        /// </summary>
         public string Institution_name { get; set; }
+        /// <summary>
+        /// 職稱
+        /// </summary>
         public string Position { get; set; }
+        /// <summary>
+        /// 起迄年月
+        /// </summary>
         public string Start_End_Date { get; set; }
+        /// <summary>
+        /// 到職薪水
+        /// </summary>
         public string Start_Salary { get; set; }
+        /// <summary>
+        /// 離職薪水
+        /// </summary>
         public string End_Salary { get; set; }
+        /// <summary>
+        /// 離職原因
+        /// </summary>
         public string Leaving_Reason { get; set; }
     }
 
@@ -82,8 +130,17 @@ namespace TalentClassLibrary.Model
     /// </summary>
     public class ContactSituation
     {
+        /// <summary>
+        /// 聯繫基本資料
+        /// </summary>
         public ContactInfo Info { get; set; }
+        /// <summary>
+        /// 聯繫狀況資料
+        /// </summary>
         public List<ContactStatus> Status { get; set; }
+        /// <summary>
+        /// 代碼
+        /// </summary>
         public string Code { get; set; }
     }
 
@@ -111,6 +168,9 @@ namespace TalentClassLibrary.Model
     /// </summary>
     public class ContactStatus
     {
+        /// <summary>
+        /// 聯繫日期
+        /// </summary>
         public string Contact_Date { get; set; }
         public string Contact_Status { get; set; }
         public string Remarks { get; set; }

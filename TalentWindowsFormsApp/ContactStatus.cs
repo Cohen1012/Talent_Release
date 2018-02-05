@@ -908,5 +908,10 @@ namespace TalentWindowsFormsApp
 
             MessageBox.Show(msg, "訊息");
         }
+
+        private void ImportLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+
+        }
     }
 }

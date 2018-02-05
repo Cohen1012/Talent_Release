@@ -55,5 +55,12 @@ namespace TalentClassLibrary.Tests
             var input = @"..\..\..\Template\匯入資料範本(人資系統).xlsx";
             ExcelHelper.GetInstance().ImportOldTalent(input);
         }
+
+        [TestMethod()]
+        public void ImportInterviewDataTest()
+        {
+            var input = @"..\..\..\Template\匯入面談資料範本.xlsx";          
+            var actual = ExcelHelper.GetInstance().ImportInterviewData(input);          
+        }
     }
 }

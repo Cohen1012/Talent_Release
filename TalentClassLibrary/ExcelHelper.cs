@@ -12,6 +12,10 @@ using Spire.Xls.Core;
 using System.Data;
 using ShareClassLibrary;
 using System.Windows.Forms;
+using TalentClassLibrary;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Reflection;
 
 namespace TalentClassLibrary
 {
@@ -185,6 +189,34 @@ namespace TalentClassLibrary
         }
 
         /// <summary>
+        /// 匯入面談資料
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public DataSet ImportInterviewData(string path)
+        {
+            ErrorMessage = string.Empty;
+            DataSet ds = new DataSet();
+            try
+            {
+                Workbook workbook = new Workbook();
+                workbook.LoadFromFile(path);
+                ////面談基本資料
+                Worksheet sheet = workbook.Worksheets["人事資料1"];
+                ds.Tables.Add(this.ReadInterviewInfoSheet(sheet));
+
+                return ds;
+            }
+            catch (Exception ex)
+            {
+                LogInfo.WriteErrorInfo(ex);
+                ErrorMessage = "匯入失敗";
+                ds.Clear();
+                return ds;
+            }
+        }
+
+        /// <summary>
         /// 匯入舊版資料
         /// </summary>
         /// <param name="path"></param>
@@ -198,7 +230,7 @@ namespace TalentClassLibrary
                 workbook.LoadFromFile(path);
                 Worksheet sheet = workbook.Worksheets[0];
                 DataTable dt = sheet.ExportDataTable();
-                if(dt.Rows.Count == 0)
+                if (dt.Rows.Count == 0)
                 {
                     ErrorMessage = "空的excel";
                     return contactSituationList;
@@ -277,8 +309,11 @@ namespace TalentClassLibrary
         /// 匯入新版資料
         /// </summary>
         /// <param name="path"></param>
-        public void ImportNewTalent(string path)
+        public List<ContactSituation> ImportNewTalent(string path)
         {
+            ErrorMessage = string.Empty;
+            string msg = string.Empty;
+            List<string> checkCodeIsRepeat = new List<string>(); ////檢查Excel內部的代碼是否有重複
             List<ContactSituation> contactSituationList = new List<ContactSituation>();
             try
             {
@@ -286,127 +321,293 @@ namespace TalentClassLibrary
                 workbook.LoadFromFile(path);
                 Worksheet sheet = workbook.Worksheets[0];
                 DataTable dt = sheet.ExportDataTable();
+                if (dt.Rows.Count == 0)
+                {
+                    ErrorMessage = "空的excel";
+                    return contactSituationList;
+                }
 
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
                     ContactSituation contactSituation = new ContactSituation();
                     ContactInfo contactInfo = new ContactInfo();
-                    ContactStatus contactStatus = new ContactStatus();
-                    ////先不處理聯繫狀況
+                    List<ContactStatus> contactStatusList = new List<ContactStatus>();
                     for (int j = 0; j < 29; j++)
                     {
+                        ////先不處理聯繫狀況
                         if (j == 3 || j == 4 || j == 5)
                         {
                             continue;
                         }
 
-                        switch (dt.Columns[j].ToString())
+                        switch (dt.Columns[j].ToString().Trim())
                         {
                             case "姓名":
-                                contactInfo.Name = dt.Rows[i].ItemArray[j].ToString();
+                                contactInfo.Name = dt.Rows[i].ItemArray[j].ToString().Trim();
                                 break;
                             case "地點":
-                                contactInfo.Place = dt.Rows[i].ItemArray[j].ToString();
+                                contactInfo.Place = dt.Rows[i].ItemArray[j].ToString().Trim();
                                 break;
                             case "1111/104代碼":
-                                contactSituation.Code = dt.Rows[i].ItemArray[j].ToString();
-                                break;
-                            case "JAVA":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "JSP":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "Android APP":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "ASP":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "C/C++":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "C#":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "ASP.NET":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "VB.NET":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "VB6":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "HTML":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "Javascript":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "Bootstrap":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "Delphi":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "PHP":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "研替":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "Hadoop":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "ETL":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "R":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "notes":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "UI/UX":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "資料庫":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                            case "Linux":
-                                contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString() + ",";
-                                break;
-                        }
-                        for (int z = 3; z <= 5; z++)
-                        {
-                            switch (dt.Columns[j].ToString())
-                            {
-                                case "日期":
-                                    string msg = Valid.GetInstance().ValidDateFormat(dt.Rows[i].ItemArray[j].ToString());
-                                    if (msg != string.Empty)
+                                ////檢查Excel內部的代碼是否有重複
+                                string[] codeList = dt.Rows[i].ItemArray[j].ToString().Trim().Split('\n');
+                                foreach (string code in codeList)
+                                {
+                                    if (checkCodeIsRepeat.Contains(code))
                                     {
-                                        MessageBox.Show(msg);
-                                        return;
+                                        contactSituationList.Clear();
+                                        ErrorMessage = "第" + (i + 1) + "行" + code + "重複\n請檢查Excel";
+                                        return contactSituationList;
                                     }
 
-                                    contactStatus.Contact_Date = dt.Rows[i].ItemArray[j].ToString();
+                                    checkCodeIsRepeat.Add(code);
+                                }
+
+                                contactSituation.Code = dt.Rows[i].ItemArray[j].ToString().Trim();
+                                break;
+                            case "JAVA":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "JSP":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "Android APP":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "ASP":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "C/C++":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "C#":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "ASP.NET":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "VB.NET":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "VB6":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "HTML":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "Javascript":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "Bootstrap":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "Delphi":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "PHP":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "研替":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "Hadoop":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "ETL":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "R":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "notes":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "UI/UX":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "資料庫":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                            case "Linux":
+                                if (!string.IsNullOrEmpty(dt.Rows[i].ItemArray[j].ToString().Trim()))
+                                    contactInfo.Skill += dt.Rows[i].ItemArray[j].ToString().Trim() + ",";
+                                break;
+                        }
+                    }
+
+                    ////聯繫狀況
+                    do
+                    {
+                        ContactStatus contactStatus = new ContactStatus();
+                        for (int z = 3; z <= 5; z++)
+                        {
+                            switch (dt.Columns[z].ToString().Trim())
+                            {
+                                case "日期":
+                                    msg = Valid.GetInstance().ValidDateFormat(dt.Rows[i].ItemArray[z].ToString().Trim());
+                                    if (msg != string.Empty)
+                                    {
+                                        contactSituationList.Clear();
+                                        ErrorMessage = "第" + (i + 1) + "行" + msg + "\n請檢查Excel";
+                                        return contactSituationList;
+                                    }
+
+                                    contactStatus.Contact_Date = dt.Rows[i].ItemArray[z].ToString().Trim();
                                     break;
                                 case "聯絡狀況":
-                                    contactStatus.Contact_Status = dt.Rows[i].ItemArray[j].ToString();
+                                    if (string.IsNullOrEmpty(dt.Rows[i].ItemArray[z].ToString().Trim()))
+                                    {
+                                        contactStatus.Contact_Status = "(無)";
+                                    }
+                                    else
+                                    {
+                                        msg = Talent.GetInstance().ValidContactStatus(dt.Rows[i].ItemArray[z].ToString().Trim());
+                                        if (msg != string.Empty)
+                                        {
+                                            contactSituationList.Clear();
+                                            ErrorMessage = "第" + (i + 1) + "行" + msg + "\n請檢查Excel";
+                                            return contactSituationList;
+                                        }
+
+                                        contactStatus.Contact_Status = dt.Rows[i].ItemArray[z].ToString().Trim();
+                                    }
                                     break;
                                 case "說明":
-                                    contactStatus.Remarks = dt.Rows[i].ItemArray[j].ToString();
+                                    contactStatus.Remarks = dt.Rows[i].ItemArray[z].ToString().Trim();
                                     break;
                             }
                         }
-                    }
+
+                        contactStatusList.Add(contactStatus);
+
+                        i++;
+                        if (i >= dt.Rows.Count)
+                        {
+                            break;
+                        }
+                    } while (string.IsNullOrEmpty(dt.Rows[i].ItemArray[0].ToString().Trim()) && string.IsNullOrEmpty(dt.Rows[i].ItemArray[1].ToString().Trim()));
+
+                    i--; ////因為在do迴圈有先i++判斷下一列的姓名與代碼是否有值，因此在跳出迴圈時，要把它減回來
+                    contactInfo.Skill = contactInfo.Skill.RemoveEndWithDelimiter(",");
+                    contactSituation.Info = contactInfo;
+                    contactSituation.Status = contactStatusList;
+                    contactSituationList.Add(contactSituation);
                 }
+
+                return contactSituationList;
             }
             catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
+                contactSituationList.Clear();
+                ErrorMessage = "讀取Excel發生錯誤";
+                return contactSituationList;
             }
+        }
+
+        /// <summary>
+        /// 讀取面談基本資料的Sheet
+        /// </summary>
+        /// <param name="sheet"></param>
+        /// <returns></returns>
+        private DataTable ReadInterviewInfoSheet(Worksheet sheet)
+        {
+            int row = 0; ////紀錄目前在哪一行
+            DataTable dt = new DataTable();
+            //DataTable dt1 = sheet.ExportDataTable();
+            ////處理圖片
+            ExcelPicture picture = sheet.Pictures[0];
+            picture.Picture.Save(@"..\..\..\Template\image.png", ImageFormat.Png);
+            InterviewInfo interviewInfo = new InterviewInfo
+            {
+                Vacancies = sheet.Range["F2"].Value.Trim(),
+                Name = sheet.Range["F4"].Value.Trim(),
+                Married = sheet.Range["F6"].Value.Trim(),
+                Adress = sheet.Range["F8"].Value.Trim(),
+                Urgent_Contact_Person = sheet.Range["F10"].Value.Trim(),
+                Interview_Date = sheet.Range["I2"].Value.Trim(),
+                Sex = sheet.Range["I4"].Value.Trim(),
+                Mail = sheet.Range["I6"].Value.Trim(),
+                Urgent_Relationship = sheet.Range["I10"].Value.Trim(),
+                Birthday = sheet.Range["L4"].Value.Trim(),
+                CellPhone = sheet.Range["L6"].Value.Trim(),
+                Urgent_CellPhone = sheet.Range["L10"].Value.Trim(),
+            };
+
+            row = 13;
+            ////學歷
+            List<Education> educationList = new List<Education>();
+            while (sheet.Range["C" + row].Value != "經歷")
+            {
+                Education education = new Education
+                {
+                    School = sheet.Range["D" + row].Value,
+                    Department = sheet.Range["E" + row].Value,
+                    Start_End_Date = sheet.Range["F" + row].Value,
+                    Is_Graduation = sheet.Range["G" + row].Value,
+                    Remark = sheet.Range["H" + row].Value,
+                };
+
+                if (!education.TResultIsEmtpty())
+                {
+                    educationList.Add(education);
+                }
+                row++;
+            }
+
+            row++;
+            ////工作經驗
+            List<WorkExperience> workExperienceList = new List<WorkExperience>();
+            while (sheet.Range["C" + row].Value != "兵役")
+            {
+                WorkExperience workExperience = new WorkExperience
+                {
+                    Institution_name = sheet.Range["D" + row].Value,
+                    Position = sheet.Range["E" + row].Value,
+                    Start_End_Date = sheet.Range["F" + row].Value,
+                    Start_Salary = sheet.Range["G" + row].Value,
+                    End_Salary = sheet.Range["H" + row].Value,
+                    Leaving_Reason = sheet.Range["I" + row].Value,
+                };
+
+                if (!workExperience.TResultIsEmtpty())
+                {
+                    workExperienceList.Add(workExperience);
+                }
+                row++;
+            }
+
+            ////兵役
+            row++;
+            interviewInfo.IsService = sheet.Range["D" + row].Value;
+            interviewInfo.Exemption_Reason = sheet.Range["E" + row].Value;
+            row += 3;
+            ////專長
+            interviewInfo.Language = sheet.Range["E" + row].Value;
+
+            return dt;
+
         }
 
         /// <summary>
@@ -923,16 +1124,16 @@ namespace TalentClassLibrary
                 sheet.Range["G" + rowCount].Text = interviewCommentsList[i].Result;
             }
             rowCount++;
-            sheet.Range["B" + (rowCount - interviewCommentsList.Count - 2) + ":M" + rowCount].BorderAround(LineStyleType.Thin);
+            sheet.Range["B" + (rowCount - interviewCommentsList.Count - 2) + ":M" + rowCount].BorderAround(LineStyleType.Medium);
             rowCount += 2;
             sheet.Range["B" + rowCount + ":C" + (rowCount + 1)].Merge();
             sheet.Range["B" + rowCount].Text = "備註";
-            sheet.Range["B" + rowCount + ":C" + (rowCount + 1)].BorderAround(LineStyleType.Thin);
+            sheet.Range["B" + rowCount + ":C" + (rowCount + 1)].BorderAround(LineStyleType.Medium);
             rowCount += 3;
             sheet.Range["B" + rowCount + ":M" + (rowCount + 2)].Merge();
             sheet.Range["B" + rowCount].Style.HorizontalAlignment = HorizontalAlignType.Left;
             sheet.Range["B" + rowCount].Text = string.IsNullOrEmpty(interviewResult.Results_Remark) ? string.Empty : interviewResult.Results_Remark;
-            sheet.Range["B" + rowCount + ":M" + (rowCount + 2)].BorderAround(LineStyleType.Thin);
+            sheet.Range["B" + rowCount + ":M" + (rowCount + 2)].BorderAround(LineStyleType.Medium);
 
 
             return sheet;
