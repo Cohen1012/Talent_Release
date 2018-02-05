@@ -32,6 +32,7 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.ImportCombo = new System.Windows.Forms.ComboBox();
             this.ExportCombo = new System.Windows.Forms.ComboBox();
             this.ImportLink = new System.Windows.Forms.LinkLabel();
             this.ExportLink = new System.Windows.Forms.LinkLabel();
@@ -143,6 +144,7 @@
             // panel1
             // 
             this.panel1.AutoScroll = true;
+            this.panel1.Controls.Add(this.ImportCombo);
             this.panel1.Controls.Add(this.ExportCombo);
             this.panel1.Controls.Add(this.ImportLink);
             this.panel1.Controls.Add(this.ExportLink);
@@ -152,6 +154,17 @@
             this.panel1.Size = new System.Drawing.Size(807, 57);
             this.panel1.TabIndex = 31;
             // 
+            // ImportCombo
+            // 
+            this.ImportCombo.FormattingEnabled = true;
+            this.ImportCombo.Items.AddRange(new object[] {
+            "新版",
+            "舊版"});
+            this.ImportCombo.Location = new System.Drawing.Point(586, 27);
+            this.ImportCombo.Name = "ImportCombo";
+            this.ImportCombo.Size = new System.Drawing.Size(89, 21);
+            this.ImportCombo.TabIndex = 31;
+            // 
             // ExportCombo
             // 
             this.ExportCombo.FormattingEnabled = true;
@@ -159,7 +172,7 @@
             "聯繫狀況",
             "面談資料",
             "所有資料"});
-            this.ExportCombo.Location = new System.Drawing.Point(554, 23);
+            this.ExportCombo.Location = new System.Drawing.Point(438, 27);
             this.ExportCombo.Name = "ExportCombo";
             this.ExportCombo.Size = new System.Drawing.Size(89, 21);
             this.ExportCombo.TabIndex = 29;
@@ -168,7 +181,7 @@
             // 
             this.ImportLink.AutoSize = true;
             this.ImportLink.Font = new System.Drawing.Font("新細明體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.ImportLink.Location = new System.Drawing.Point(702, 25);
+            this.ImportLink.Location = new System.Drawing.Point(681, 29);
             this.ImportLink.Name = "ImportLink";
             this.ImportLink.Size = new System.Drawing.Size(47, 19);
             this.ImportLink.TabIndex = 30;
@@ -180,7 +193,7 @@
             // 
             this.ExportLink.AutoSize = true;
             this.ExportLink.Font = new System.Drawing.Font("新細明體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.ExportLink.Location = new System.Drawing.Point(649, 25);
+            this.ExportLink.Location = new System.Drawing.Point(533, 29);
             this.ExportLink.Name = "ExportLink";
             this.ExportLink.Size = new System.Drawing.Size(47, 19);
             this.ExportLink.TabIndex = 0;
@@ -554,5 +567,6 @@
         private System.Windows.Forms.TextBox EndEditDateTxt;
         private System.Windows.Forms.Button CalendarBtn;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.ComboBox ImportCombo;
     }
 }

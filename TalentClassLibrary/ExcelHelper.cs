@@ -515,6 +515,14 @@ namespace TalentClassLibrary
                     contactSituationList.Add(contactSituation);
                 }
 
+                msg = Talent.GetInstance().ValidCodeIsRepeat(checkCodeIsRepeat);
+                if (msg != string.Empty)
+                {
+                    contactSituationList.Clear();
+                    ErrorMessage = msg + "\n請檢查Excel";
+                    return contactSituationList;
+                }
+
                 return contactSituationList;
             }
             catch (Exception ex)

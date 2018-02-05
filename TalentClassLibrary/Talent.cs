@@ -192,7 +192,7 @@ namespace TalentClassLibrary
                     this.CommitTransaction();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
@@ -222,7 +222,7 @@ namespace TalentClassLibrary
                     return states + "成功";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
@@ -277,7 +277,7 @@ namespace TalentClassLibrary
                 ds.Tables.Add(delList);
                 return ds;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
                 return new DataSet();
@@ -398,7 +398,7 @@ namespace TalentClassLibrary
                     return "刪除成功";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
@@ -482,7 +482,7 @@ namespace TalentClassLibrary
                     return "修改成功";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
@@ -937,7 +937,7 @@ namespace TalentClassLibrary
             try
             {
                 using (SqlCommand cmd = new SqlCommand(insert, ScConnection, StTransaction))
-                {                    
+                {
                     foreach (DataRow dr in inData.Rows)
                     {
                         cmd.Parameters.Clear();
@@ -1105,7 +1105,7 @@ namespace TalentClassLibrary
                     return "新增成功";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
@@ -1131,7 +1131,7 @@ namespace TalentClassLibrary
 
                 return msg;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
                 msg = "帳號須為本公司之帳號";
@@ -1590,7 +1590,7 @@ namespace TalentClassLibrary
                     return idList;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
                 ErrorMessage = "資料庫發生錯誤";
@@ -2018,7 +2018,7 @@ namespace TalentClassLibrary
 
                 return ds;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
                 ErrorMessage = "資料庫發生錯誤";
@@ -2161,7 +2161,7 @@ namespace TalentClassLibrary
 
                 return dt;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
                 ErrorMessage = "資料庫發生錯誤";
@@ -2197,7 +2197,7 @@ namespace TalentClassLibrary
 
                 return dt;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
                 ErrorMessage = "資料庫發生錯誤";
@@ -2299,7 +2299,7 @@ namespace TalentClassLibrary
                     return "修改成功";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.RollbackTransaction();
                 LogInfo.WriteErrorInfo(ex);
@@ -2718,7 +2718,7 @@ namespace TalentClassLibrary
                     return "修改成功";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.RollbackTransaction();
                 LogInfo.WriteErrorInfo(ex);
@@ -2764,7 +2764,7 @@ namespace TalentClassLibrary
                     return "修改成功";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.RollbackTransaction();
                 LogInfo.WriteErrorInfo(ex);
@@ -2838,7 +2838,7 @@ namespace TalentClassLibrary
                 }
                 return msg;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
                 return false;
@@ -2880,7 +2880,7 @@ namespace TalentClassLibrary
                 }
                 return msg;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
                 return false;
@@ -2950,6 +2950,65 @@ namespace TalentClassLibrary
             }
 
             return msg;
+        }
+
+        /// <summary>
+        /// 驗證從Excel匯入的代碼是否已存在於資料庫
+        /// </summary>
+        /// <param name="codeList"></param>
+        /// <returns></returns>
+        public string ValidCodeIsRepeat(List<string> codeList)
+        {
+            string msg = string.Empty;
+            DataTable dt = new DataTable();
+            string select = @"select Code_Id from Code where Code_Id in (";
+
+            if (codeList.Count == 0)
+            {
+                return msg;
+            }
+
+            for (int i = 0; i < codeList.Count; i++)
+            {
+                select += @"@codeId" + i + ",";
+            }
+
+            select = select.RemoveEndWithDelimiter(",") + ")";
+
+            try
+            {
+                using (SqlDataAdapter da = new SqlDataAdapter(select, ScConnection))
+                {
+                    for (int i = 0; i < codeList.Count; i++)
+                    {
+                        da.SelectCommand.Parameters.Add("@codeId" + i, SqlDbType.VarChar).Value = codeList[i];
+                    }
+
+                    da.Fill(dt);
+                }
+
+                if(dt.Rows.Count == 0)
+                {
+                    return msg;
+                }
+
+                foreach(DataRow dr in dt.Rows)
+                {
+                    msg += dr[0].ToString() + "此代碼已存在\n";
+                }
+
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                LogInfo.WriteErrorInfo(ex);
+                msg = "資料庫錯誤";
+                return msg;
+            }
+            finally
+            {
+                this.CloseDatabaseConnection();
+            }
         }
 
         /// <summary>
@@ -3036,7 +3095,7 @@ namespace TalentClassLibrary
             }
 
             return msg;
-        }       
+        }
 
         /// <summary>
         /// 驗證欲新增的帳號是否已存在
@@ -3082,7 +3141,7 @@ namespace TalentClassLibrary
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogInfo.WriteErrorInfo(ex);
                 return "發生錯誤";
@@ -3214,7 +3273,7 @@ namespace TalentClassLibrary
                     return "刪除成功";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.RollbackTransaction();
                 LogInfo.WriteErrorInfo(ex);
@@ -3269,7 +3328,7 @@ namespace TalentClassLibrary
             if (validMsg != string.Empty)
             {
                 msg += validMsg + "\n";
-            }           
+            }
 
             if (!string.IsNullOrEmpty(string.Empty))
             {

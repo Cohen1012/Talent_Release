@@ -25,7 +25,6 @@ namespace TalentClassLibrary
 
         public string InsertContactSituationInfoData(List<ContactSituation> contactSituationList)
         {
-            int i = 1;
             string contact_Id = string.Empty;
             string insert = string.Empty;
             try
@@ -55,14 +54,29 @@ namespace TalentClassLibrary
                         foreach(ContactStatus contactstatus in contactSituation.Status)
                         {
                             cmd.Parameters.Clear();
-                            cmd.Parameters.Add(@"Contact_Status", SqlDbType.NVarChar).Value = "人資系統資料";
+                            cmd.Parameters.Add(@"Contact_Status", SqlDbType.NVarChar).Value =  contactstatus.Contact_Status ?? "人資系統資料";
                             cmd.Parameters.Add(@"Remarks", SqlDbType.NVarChar).Value = contactstatus.Remarks ?? string.Empty;
                             cmd.Parameters.Add(@"Contact_Date", SqlDbType.DateTime).Value = string.IsNullOrEmpty(contactstatus.Contact_Date)? "2000/1/1": contactstatus.Contact_Date;
                             cmd.Parameters.Add(@"Contact_Id", SqlDbType.Int).Value = contact_Id;
                             cmd.ExecuteNonQuery();
                         }
+                        ////新增代碼
+                        cmd.CommandText = @"insert into Code (Code_Id,Contact_Id)
+                                        values (@Code_Id,@Contact_Id)";
+                        if(string.IsNullOrEmpty(contactSituation.Code))
+                        {
+                            continue;
+                        }
 
-                        i++;
+                        string[] codeList = contactSituation.Code.Trim().Split('\n');
+
+                        foreach (string code in codeList)
+                        {
+                            cmd.Parameters.Clear();
+                            cmd.Parameters.Add(@"Code_Id", SqlDbType.VarChar).Value = code;
+                            cmd.Parameters.Add(@"Contact_Id", SqlDbType.Int).Value = contact_Id;
+                            cmd.ExecuteNonQuery();
+                        }
                     }
 
                     this.CommitTransaction();
@@ -71,7 +85,6 @@ namespace TalentClassLibrary
             }
             catch (Exception ex)
             {
-                MessageBox.Show(i.ToString());
                 LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
                 return "匯入失敗";

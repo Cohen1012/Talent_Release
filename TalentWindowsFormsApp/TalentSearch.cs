@@ -28,6 +28,7 @@ namespace TalentWindowsFormsApp
             IsInterviewCombo.SelectedItem = "不限";
             InterviewResultCombo.SelectedItem = "不限";
             ExportCombo.SelectedItem = "聯繫狀況";
+            ImportCombo.SelectedItem = "新版";
         }
 
         private void SearchBtn_Click(object sender, EventArgs e)
@@ -324,6 +325,8 @@ namespace TalentWindowsFormsApp
 
         private void ImportLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
+            string importMode = ImportCombo.SelectedItem.ToString();
+            List<ContactSituation> contactSituationList = new List<ContactSituation>();
             OpenFileDialog ofd = new OpenFileDialog
             {
                 Title = "請選擇上傳的聯繫狀況Excel",
@@ -334,8 +337,20 @@ namespace TalentWindowsFormsApp
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                List<ContactSituation> contactSituationList = ExcelHelper.GetInstance().ImportOldTalent(ofd.FileName);
-                if(!string.IsNullOrEmpty(ExcelHelper.GetInstance().ErrorMessage))
+                switch (importMode)
+                {
+                    case "新版":
+                        contactSituationList = ExcelHelper.GetInstance().ImportNewTalent(ofd.FileName);
+                        break;
+                    case "舊版":
+                        contactSituationList = ExcelHelper.GetInstance().ImportOldTalent(ofd.FileName);
+                        break;
+                    default:
+                        MessageBox.Show("沒有匯出任何資料","錯誤訊息");
+                        break;
+                }
+
+                if (!string.IsNullOrEmpty(ExcelHelper.GetInstance().ErrorMessage))
                 {
                     MessageBox.Show(ExcelHelper.GetInstance().ErrorMessage);
                     return;
