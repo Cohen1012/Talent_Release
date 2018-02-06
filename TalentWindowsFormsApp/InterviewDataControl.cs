@@ -128,6 +128,44 @@ namespace TalentWindowsFormsApp
         }
 
         /// <summary>
+        /// 從excel讀取資料
+        /// </summary>
+        /// <param name="path">檔案路徑</param>
+        public void GetdataByExcel(string path)
+        {
+            DataSet ds = ExcelHelper.GetInstance().ImportInterviewData(path);
+            if(!string.IsNullOrEmpty(ExcelHelper.GetInstance().ErrorMessage))
+            {
+                MessageBox.Show(ExcelHelper.GetInstance().ErrorMessage,"錯誤訊息");
+                return;
+            }
+            ////先將DB資料備份
+            DataSet dataSet = new DataSet();
+            dataSet.Tables.Add(InterviewInfoDB.Copy());
+            dataSet.Tables.Add(InterviewCommentsDB.Copy());
+            dataSet.Tables.Add(InterviewResultDB.Copy());
+            dataSet.Tables.Add(ProjectExperienceDB.Copy());
+            ////清空畫面
+            InterviewInfoDB.Clear();
+            ProjectExperienceDB.Clear();
+            ProjectExperienceUI.Clear();
+            panel2.Controls.Clear();
+            InterviewResultDB.Clear();
+            InterviewCommentsDB.Clear();
+
+            UpdateInterviewPage(ds);
+            UpdateInterviewResult(ds);
+            UpdateProjectExperience(ds);            
+            ////
+            InterviewInfoDB = dataSet.Tables[0].Copy();
+            InterviewCommentsDB = dataSet.Tables[1].Copy();
+            InterviewResultDB = dataSet.Tables[2].Copy();
+            ProjectExperienceDB = dataSet.Tables[3].Copy();
+
+            MessageBox.Show("匯入成功");
+        }
+
+        /// <summary>
         /// 面談資料間轉換，要卡是否有儲存資料
         /// </summary>
         /// <param name="e"></param>
@@ -167,9 +205,17 @@ namespace TalentWindowsFormsApp
             InitializeComponent();
             Interview_Id = interviewId;
             Contact_Id = contactId;
-            UpdateInterviewPage();
-            UpdateInterviewResult();
-            UpdateProjectExperience();
+
+            DataSet ds = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
+            if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+            {
+                MessageBox.Show(Talent.GetInstance().ErrorMessage, "錯誤訊息");
+                return;
+            }
+
+            UpdateInterviewPage(ds);
+            UpdateInterviewResult(ds);
+            UpdateProjectExperience(ds);
         }
 
         /// <summary>
@@ -198,16 +244,33 @@ namespace TalentWindowsFormsApp
         }
 
         /// <summary>
+        /// 面談資料修改模式
+        /// </summary>
+        private void UpdateInterviewPage(DataSet ds)
+        {
+            //DataSet ds = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
+            //if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+            //{
+            //    MessageBox.Show("人事資料載入失敗");
+            //    return;
+            //}
+
+            InterviewInfoDB = ds.Tables[0].Copy();
+            InterviewInfoDB = this.DBNullToEmpty(InterviewInfoDB);
+            this.ShowInterviewInfo(InterviewInfoDB);
+        }
+
+        /// <summary>
         /// 專案經驗
         /// </summary>
-        private void UpdateProjectExperience()
+        private void UpdateProjectExperience(DataSet ds)
         {
-            DataSet ds = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
-            if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
-            {
-                MessageBox.Show("專案經驗載入失敗");
-                return;
-            }
+            //DataSet ds = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
+            //if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+            //{
+            //    MessageBox.Show("專案經驗載入失敗");
+            //    return;
+            //}
 
             ProjectExperienceDB = ds.Tables[3].Copy();
             ProjectExperienceDB = this.DBNullToEmpty(ProjectExperienceDB);
@@ -217,14 +280,14 @@ namespace TalentWindowsFormsApp
         /// <summary>
         /// 面談結果
         /// </summary>
-        private void UpdateInterviewResult()
+        private void UpdateInterviewResult(DataSet ds)
         {
-            DataSet ds = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
-            if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
-            {
-                MessageBox.Show("面談結果載入失敗");
-                return;
-            }
+            //DataSet ds = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
+            //if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+            //{
+            //    MessageBox.Show("面談結果載入失敗");
+            //    return;
+            //}
 
             InterviewCommentsDB = ds.Tables[1].Copy();
             InterviewCommentsDB = this.DBNullToEmpty(InterviewCommentsDB);
@@ -342,24 +405,7 @@ namespace TalentWindowsFormsApp
             CommentsGrid.Columns["Result"].HeaderText = "面談結果";
             CommentsGrid.Columns["Result"].Width = 1000;
             CommentsGrid.Columns.Add(DelColumn());
-        }
-
-        /// <summary>
-        /// 面談資料修改模式
-        /// </summary>
-        private void UpdateInterviewPage()
-        {
-            DataSet ds = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
-            if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
-            {
-                MessageBox.Show("人事資料載入失敗");
-                return;
-            }
-
-            InterviewInfoDB = ds.Tables[0].Copy();
-            InterviewInfoDB = this.DBNullToEmpty(InterviewInfoDB);
-            this.ShowInterviewInfo(InterviewInfoDB);
-        }
+        }       
 
         /// <summary>
         /// 顯示面談基本資料
@@ -1001,7 +1047,7 @@ namespace TalentWindowsFormsApp
             ////工作經歷
             interviewInfoUI.Work_Experience = interviewInfoUI.Work_Experience == "[]" ? string.Empty : interviewInfoUI.Work_Experience;
             ////語言能力
-            interviewInfoUI.Language = interviewInfoUI.Language == "[]" ? string.Empty : interviewInfoUI.Language;           
+            interviewInfoUI.Language = interviewInfoUI.Language == "[]" ? string.Empty : interviewInfoUI.Language;
 
             return interviewInfoUI;
         }
@@ -1092,7 +1138,13 @@ namespace TalentWindowsFormsApp
             else
             {
                 InterviewInfoDB.Clear();
-                this.UpdateInterviewPage();
+                DataSet dataSet = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
+                if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+                {
+                    MessageBox.Show(Talent.GetInstance().ErrorMessage, "錯誤訊息");
+                    return;
+                }
+                this.UpdateInterviewPage(dataSet);
             }
 
             ////儲存專案經驗資料
@@ -1107,7 +1159,14 @@ namespace TalentWindowsFormsApp
                 ProjectExperienceDB.Clear();
                 ProjectExperienceUI.Clear();
                 panel2.Controls.Clear();
-                UpdateProjectExperience();
+                DataSet dataSet = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
+                if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+                {
+                    MessageBox.Show(Talent.GetInstance().ErrorMessage, "錯誤訊息");
+                    return;
+                }
+
+                UpdateProjectExperience(dataSet);
             }
 
             ////儲存面談結果資料
@@ -1120,7 +1179,13 @@ namespace TalentWindowsFormsApp
             else
             {
                 InterviewResultDB.Clear();
-                UpdateInterviewResult();
+                DataSet dataSet = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
+                if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+                {
+                    MessageBox.Show(Talent.GetInstance().ErrorMessage, "錯誤訊息");
+                    return;
+                }
+                UpdateInterviewResult(dataSet);
             }
 
             MessageBox.Show("儲存成功", "訊息");
@@ -1178,8 +1243,15 @@ namespace TalentWindowsFormsApp
                 MessageBox.Show("儲存成功", "訊息");
 
                 UpdateTimeClick(e);
-                this.UpdateInterviewPage();
-                this.UpdateInterviewResult();
+
+                DataSet dataSet = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
+                if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+                {
+                    MessageBox.Show(Talent.GetInstance().ErrorMessage, "錯誤訊息");
+                    return;
+                }
+                this.UpdateInterviewPage(dataSet);
+               // this.UpdateInterviewResult(dataSet);
             }
             else
             {
@@ -1222,7 +1294,13 @@ namespace TalentWindowsFormsApp
                     MessageBox.Show("儲存成功", "訊息");
 
                     UpdateTimeClick(e);
-                    this.UpdateInterviewPage();
+                    DataSet dataSet = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
+                    if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+                    {
+                        MessageBox.Show(Talent.GetInstance().ErrorMessage, "錯誤訊息");
+                        return;
+                    }
+                    this.UpdateInterviewPage(dataSet);
                 }
             }
 
@@ -1284,7 +1362,13 @@ namespace TalentWindowsFormsApp
                 ProjectExperienceUI.Clear();
                 panel2.Controls.Clear();
                 UpdateTimeClick(e);
-                UpdateProjectExperience();
+                DataSet dataSet = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
+                if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+                {
+                    MessageBox.Show(Talent.GetInstance().ErrorMessage, "錯誤訊息");
+                    return;
+                }
+                UpdateProjectExperience(dataSet);
             }
         }
 
@@ -1325,11 +1409,18 @@ namespace TalentWindowsFormsApp
             else
             {
                 InterviewResultDB.Clear();
+                InterviewCommentsDB.Clear();
             }
 
             MessageBox.Show("儲存成功", "訊息");
             UpdateTimeClick(e);
-            UpdateInterviewResult();
+            DataSet dataSet = Talent.GetInstance().SelectInterviewDataById(Interview_Id);
+            if (!string.IsNullOrEmpty(Talent.GetInstance().ErrorMessage))
+            {
+                MessageBox.Show(Talent.GetInstance().ErrorMessage, "錯誤訊息");
+                return;
+            }
+            UpdateInterviewResult(dataSet);
         }
 
         /// <summary>

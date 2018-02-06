@@ -2671,12 +2671,12 @@ namespace TalentClassLibrary
                         cmd.Parameters.Add("@interviewDate", SqlDbType.Date).Value = dr["Interview_Date"].ToString().Trim();
                         cmd.Parameters.Add("@interviewId", SqlDbType.Int).Value = interviewId;
                         cmd.Parameters.Add("@name", SqlDbType.NVarChar).Value = dr["Name"].ToString().Trim();
-                        cmd.Parameters.Add("@sex", SqlDbType.NChar).Value = dr["Sex"].ToString().Trim();
+                        cmd.Parameters.Add("@sex", SqlDbType.NVarChar).Value = dr["Sex"].ToString().Trim();
                         cmd.Parameters.Add("@birthday", SqlDbType.Date).Value = Common.GetInstance().ValueIsNullOrEmpty(dr["Birthday"].ToString().Trim());
-                        cmd.Parameters.Add("@married", SqlDbType.NChar).Value = dr["Married"].ToString().Trim();
+                        cmd.Parameters.Add("@married", SqlDbType.NVarChar).Value = dr["Married"].ToString().Trim();
                         cmd.Parameters.Add("@mail", SqlDbType.VarChar).Value = dr["Mail"].ToString().Trim();
                         cmd.Parameters.Add("@adress", SqlDbType.NVarChar).Value = dr["Adress"].ToString().Trim();
-                        cmd.Parameters.Add("@cellPhone", SqlDbType.Char).Value = dr["CellPhone"].ToString().Trim();
+                        cmd.Parameters.Add("@cellPhone", SqlDbType.NVarChar).Value = dr["CellPhone"].ToString().Trim();
                         cmd.ExecuteNonQuery();
                     }
 
@@ -2899,8 +2899,8 @@ namespace TalentClassLibrary
         /// <param name="sex">值為"男"or"女"</param>
         /// <param name="mail">e-mail格式</param>
         /// <param name="cellPhone">手機格式</param>
-        /// <param name="place"><地點/param>
-        /// <param name="skill">地點</param>
+        /// <param name="place"><地點</param>
+        /// <param name="skill">技能</param>
         /// <param name="cooperationMode">合作模式值為"全職"or"合約"or"皆可"</param>
         /// <param name="states">狀態值為"追蹤"or"保留"</param>
         /// <returns>空值代表沒有錯誤</returns>

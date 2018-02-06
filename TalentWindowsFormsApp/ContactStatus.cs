@@ -708,6 +708,7 @@ namespace TalentWindowsFormsApp
                     {
                         interviewDataControl = (InterviewDataControl)c;
                         interviewDataControl.InterviewPageChange(e);
+                        break;
                     }
                 }
 
@@ -912,6 +913,39 @@ namespace TalentWindowsFormsApp
         private void ImportLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
 
+            if(tabControl1.SelectedIndex == 0)
+            {
+                return;
+            }
+
+            DialogResult result = MessageBox.Show("將會覆蓋此面談資料，是否繼續?", "警告", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (result != DialogResult.Yes)
+            {
+                return;
+            }
+
+                OpenFileDialog ofd = new OpenFileDialog
+            {
+                Title = "請選擇欲上傳的面談資料Excel",
+                Filter = @"Excel Files|*.xlsx",
+                Multiselect = false,
+                RestoreDirectory = true
+            };
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                InterviewDataControl interviewDataControl = new InterviewDataControl();
+                TabPage tabPage = tabControl1.TabPages["Interview" + tabControl1.SelectedIndex];
+                foreach (Control c in tabPage.Controls)
+                {
+                    if (c is InterviewDataControl)
+                    {
+                        interviewDataControl = (InterviewDataControl)c;
+                        interviewDataControl.GetdataByExcel(ofd.FileName);
+                        break;
+                    }
+                }
+            }
         }
     }
 }

@@ -1,21 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json;
+using ServiceStack;
+using ShareClassLibrary;
 using Spire.Xls;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Drawing.Imaging;
 using System.IO;
 using TalentClassLibrary.Model;
-using ServiceStack.Text;
-using ServiceStack;
-using Spire.Xls.Core;
-using System.Data;
-using ShareClassLibrary;
-using System.Windows.Forms;
-using TalentClassLibrary;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Reflection;
 
 namespace TalentClassLibrary
 {
@@ -204,6 +196,12 @@ namespace TalentClassLibrary
                 ////面談基本資料
                 Worksheet sheet = workbook.Worksheets["人事資料1"];
                 ds.Tables.Add(this.ReadInterviewInfoSheet(sheet));
+                ////面談結果
+                Worksheet sheet2 = workbook.Worksheets["面談結果1"];
+                ds.Tables.AddRange(this.ReadInterviewResultSheet(sheet2));
+                ////專案經驗
+                Worksheet sheet1 = workbook.Worksheets["專案經驗1"];
+                ds.Tables.Add(this.ReadProjectExperienceSheet(sheet1));
 
                 return ds;
             }
@@ -535,6 +533,116 @@ namespace TalentClassLibrary
         }
 
         /// <summary>
+        /// 讀取面談結果的Sheet
+        /// </summary>
+        /// <param name="sheet"></param>
+        /// <returns></returns>
+        private DataTable[] ReadInterviewResultSheet(Worksheet sheet)
+        {
+            DataTable[] dt = new DataTable[2];
+            int row = 2; ////紀錄目前在哪一行
+            InterviewResult interviewResult = new InterviewResult();
+            List<InterviewComments> interviewCommentList = new List<InterviewComments>();
+            if (sheet.Range["B" + row].Value.Trim() != "任用評定")
+            {
+                throw new Exception("面談結果sheet格式不符合");
+            }
+
+            row = 5;
+            interviewResult.Appointment = string.Empty;
+            ////任用評定
+            for (int i = 5; i <= 7; i++)
+            {
+                if (sheet.Range["B" + row].Value.Trim().StartsWith("■"))
+                {
+                    interviewResult.Appointment = sheet.Range["B" + row].Value.Trim().RemoveStartsWithDelimiter("■");
+                    break;
+                }
+                row++;
+            }
+
+            row = 13;
+            ////面談評語
+            while (sheet.Range["B" + row].Value.Trim() != "備註")
+            {
+                InterviewComments interviewComments = new InterviewComments
+                {
+                    Interviewer = sheet.Range["C" + row].Value.Trim(),
+                    Result = sheet.Range["G" + row].Value.Trim()
+                };
+
+                if (!interviewComments.TResultIsEmtpty())
+                {
+                    interviewCommentList.Add(interviewComments);
+                }
+                row++;
+                if (sheet.Range["B" + row].Value.Trim() == "備註")
+                {
+                    break;
+                }
+
+                row++;
+            }
+
+            row += 3;
+            interviewResult.Results_Remark = sheet.Range["B" + row].Value.Trim();
+            List<InterviewResult> interviewResultList = new List<InterviewResult>
+            {
+                interviewResult
+            };
+
+            if(interviewCommentList.Count == 0)
+            {
+                interviewCommentList.Add(new InterviewComments());
+            }
+
+            dt[1] = interviewResultList.ListToDataTable();
+            dt[0] = interviewCommentList.ListToDataTable();
+
+            return dt;
+        }
+
+        /// <summary>
+        /// 讀取專案經驗的Sheet
+        /// </summary>
+        /// <param name="sheet"></param>
+        /// <returns></returns>
+        private DataTable ReadProjectExperienceSheet(Worksheet sheet)
+        {
+            int row = 2; ////紀錄目前在哪一行
+            List<ProjectExperience> projectExperienceList = new List<ProjectExperience>();
+            while (!string.IsNullOrEmpty(sheet.Range["B" + row].Value.Trim()) && sheet.Range["B" + row].Value.Trim().Equals("公司名稱"))
+            {
+                ProjectExperience projectExperience = new ProjectExperience
+                {
+                    Company = sheet.Range["C" + row].Value.Trim(),
+                    Position = sheet.Range["H" + row].Value.Trim(),
+                };
+
+                row++;
+                projectExperience.Project_Name = sheet.Range["C" + row].Value.Trim();
+                projectExperience.Start_End_Date = sheet.Range["H" + row].Value.Trim();
+                row++;
+                projectExperience.OS = sheet.Range["C" + row].Value.Trim();
+                projectExperience.Language = sheet.Range["H" + row].Value.Trim();
+                row++;
+                projectExperience.Database = sheet.Range["C" + row].Value.Trim();
+                projectExperience.Tools = sheet.Range["H" + row].Value.Trim();
+                row++;
+                projectExperience.Description = sheet.Range["C" + row].Value.Trim();
+                row += 3;
+                projectExperienceList.Add(projectExperience);
+            }
+
+            if(projectExperienceList.Count == 0)
+            {
+                projectExperienceList.Add(new ProjectExperience());
+            }
+
+            return projectExperienceList.ListToDataTable();
+        }
+
+        /// <summary>
         /// 讀取面談基本資料的Sheet
         /// </summary>
         /// <param name="sheet"></param>
@@ -543,10 +651,11 @@ namespace TalentClassLibrary
         {
             int row = 0; ////紀錄目前在哪一行
             DataTable dt = new DataTable();
-            //DataTable dt1 = sheet.ExportDataTable();
-            ////處理圖片
-            ExcelPicture picture = sheet.Pictures[0];
-            picture.Picture.Save(@"..\..\..\Template\image.png", ImageFormat.Png);
+            if (sheet.Range["E2"].Value.Trim() != "應徵職缺")
+            {
+                throw new Exception("面談結果sheet格式不符合");
+            }
+
             InterviewInfo interviewInfo = new InterviewInfo
             {
                 Vacancies = sheet.Range["F2"].Value.Trim(),
@@ -563,18 +672,28 @@ namespace TalentClassLibrary
                 Urgent_CellPhone = sheet.Range["L10"].Value.Trim(),
             };
 
+            ////處理圖片
+            if (sheet.Pictures.Count > 0)
+            {
+                ExcelPicture picture = sheet.Pictures[0];
+                string a = Path.GetTempFileName();
+                picture.Picture.Save(a, ImageFormat.Png);
+                interviewInfo.Image = a;
+                //picture.Picture.Save(@"..\..\..\Template\image.png", ImageFormat.Png);
+            }
+
             row = 13;
-            ////學歷
+            ////教育程度
             List<Education> educationList = new List<Education>();
-            while (sheet.Range["C" + row].Value != "經歷")
+            while (sheet.Range["C" + row].Value.Trim() != "經歷")
             {
                 Education education = new Education
                 {
-                    School = sheet.Range["D" + row].Value,
-                    Department = sheet.Range["E" + row].Value,
-                    Start_End_Date = sheet.Range["F" + row].Value,
-                    Is_Graduation = sheet.Range["G" + row].Value,
-                    Remark = sheet.Range["H" + row].Value,
+                    School = sheet.Range["D" + row].Value.Trim(),
+                    Department = sheet.Range["E" + row].Value.Trim(),
+                    Start_End_Date = sheet.Range["F" + row].Value.Trim(),
+                    Is_Graduation = sheet.Range["G" + row].Value.Trim(),
+                    Remark = sheet.Range["H" + row].Value.Trim(),
                 };
 
                 if (!education.TResultIsEmtpty())
@@ -583,20 +702,22 @@ namespace TalentClassLibrary
                 }
                 row++;
             }
+            interviewInfo.Education = JsonConvert.SerializeObject(educationList, Formatting.Indented);
+            interviewInfo.Education = interviewInfo.Education == "[]" ? string.Empty : interviewInfo.Education;
 
             row++;
             ////工作經驗
             List<WorkExperience> workExperienceList = new List<WorkExperience>();
-            while (sheet.Range["C" + row].Value != "兵役")
+            while (sheet.Range["C" + row].Value.Trim() != "兵役")
             {
                 WorkExperience workExperience = new WorkExperience
                 {
-                    Institution_name = sheet.Range["D" + row].Value,
-                    Position = sheet.Range["E" + row].Value,
-                    Start_End_Date = sheet.Range["F" + row].Value,
-                    Start_Salary = sheet.Range["G" + row].Value,
-                    End_Salary = sheet.Range["H" + row].Value,
-                    Leaving_Reason = sheet.Range["I" + row].Value,
+                    Institution_name = sheet.Range["D" + row].Value.Trim(),
+                    Position = sheet.Range["E" + row].Value.Trim(),
+                    Start_End_Date = sheet.Range["F" + row].Value.Trim(),
+                    Start_Salary = sheet.Range["G" + row].Value.Trim(),
+                    End_Salary = sheet.Range["H" + row].Value.Trim(),
+                    Leaving_Reason = sheet.Range["I" + row].Value.Trim(),
                 };
 
                 if (!workExperience.TResultIsEmtpty())
@@ -605,14 +726,90 @@ namespace TalentClassLibrary
                 }
                 row++;
             }
+            interviewInfo.Work_Experience = JsonConvert.SerializeObject(workExperienceList, Formatting.Indented);
+            interviewInfo.Work_Experience = interviewInfo.Work_Experience == "[]" ? string.Empty : interviewInfo.Work_Experience;
 
             ////兵役
             row++;
-            interviewInfo.IsService = sheet.Range["D" + row].Value;
-            interviewInfo.Exemption_Reason = sheet.Range["E" + row].Value;
+            interviewInfo.IsService = sheet.Range["D" + row].Value.Trim();
+            interviewInfo.Exemption_Reason = sheet.Range["E" + row].Value.Trim();
             row += 3;
             ////專長
-            interviewInfo.Language = sheet.Range["E" + row].Value;
+            ////專長-程式語言
+            interviewInfo.Expertise_Language = GetExpertise(sheet, row, 11, 13);
+            row += 2;
+            ////專長-開發工具
+            interviewInfo.Expertise_Tools = GetExpertise(sheet, row, 7, 12);
+            interviewInfo.Expertise_Tools_Framwork = sheet.Range[row, 9].Value.Trim();
+            row += 2;
+            ////專長-Devops
+            interviewInfo.Expertise_Devops = GetExpertise(sheet, row, 9, 11);
+            row += 2;
+            ////專長-作業系統
+            interviewInfo.Expertise_OS = GetExpertise(sheet, row, 9, 11);
+            row += 2;
+            ////專長-大數據
+            interviewInfo.Expertise_BigData = GetExpertise(sheet, row, 7, 9);
+            row += 2;
+            ////專長-資料庫
+            interviewInfo.Expertise_DataBase = GetExpertise(sheet, row, 8, 10);
+            row += 2;
+            ////專長-專業認證
+            interviewInfo.Expertise_Certification = GetExpertise(sheet, row, 9, 11);
+            row += 3;
+            ////語言能力
+            List<Language> languageList = new List<Language>();
+            while (sheet.Range["C" + row].Value.Trim() != "最近三年內，是否有計畫繼續就學或出國深造?")
+            {
+                Language language = new Language
+                {
+                    Language_Name = sheet.Range["D" + row].Value.Trim(),
+                    Listen = sheet.Range["E" + row].Value.Trim(),
+                    Speak = sheet.Range["F" + row].Value.Trim(),
+                    Read = sheet.Range["G" + row].Value.Trim(),
+                    Write = sheet.Range["H" + row].Value.Trim(),
+                };
+
+                if (!language.TResultIsEmtpty())
+                {
+                    languageList.Add(language);
+                }
+                row++;
+            }
+            interviewInfo.Language = JsonConvert.SerializeObject(languageList, Formatting.Indented);
+            interviewInfo.Language = interviewInfo.Language == "[]" ? string.Empty : interviewInfo.Language;
+            row++;
+            interviewInfo.IsStudy = sheet.Range["C" + row].Value.Trim();
+            row += 2;
+            interviewInfo.IsService = sheet.Range["F" + row].Value.Trim();
+            interviewInfo.Relatives_Relationship = sheet.Range["J" + row].Value.Trim();
+            interviewInfo.Relatives_Name = sheet.Range["N" + row].Value.Trim();
+            row += 2;
+            interviewInfo.Care_Work = sheet.Range["F" + row].Value.Trim();
+            interviewInfo.Hope_Salary = sheet.Range["J" + row].Value.Trim();
+            interviewInfo.When_Report = sheet.Range["N" + row].Value.Trim();
+            row += 2;
+            interviewInfo.Advantage = sheet.Range["D" + row].Value.Trim();
+            interviewInfo.Disadvantages = sheet.Range["J" + row].Value.Trim();
+            row += 2;
+            interviewInfo.Hobby = sheet.Range["D" + row].Value.Trim();
+            row += 3;
+            interviewInfo.Attract_Reason = sheet.Range["C" + row].Value.Trim();
+            row += 3;
+            interviewInfo.Future_Goal = sheet.Range["C" + row].Value.Trim();
+            row += 3;
+            interviewInfo.Hope_Supervisor = sheet.Range["C" + row].Value.Trim();
+            row += 3;
+            interviewInfo.Hope_Promise = sheet.Range["C" + row].Value.Trim();
+            row += 3;
+            interviewInfo.Introduction = sheet.Range["C" + row].Value.Trim();
+
+            List<InterviewInfo> interviewInfoList = new List<InterviewInfo>
+            {
+                interviewInfo
+            };
+
+            dt = interviewInfoList.ListToDataTable();
 
             return dt;
 
@@ -970,6 +1167,30 @@ namespace TalentClassLibrary
             sheet.Range[row, 3].Style.HorizontalAlignment = HorizontalAlignType.Left;
             sheet.Range[row, 3].Text = interviewInfo.Introduction;
             return sheet;
+        }
+
+        /// <summary>
+        /// 打專長組成字串
+        /// </summary>
+        /// <param name="row">第幾行</param>
+        /// <param name="endExpertiseIndex">最後預設的專長的欄數</param>
+        /// <param name="otherExpertiseIndex">其他專長的欄數</param>
+        /// <returns></returns>
+        private string GetExpertise(Worksheet sheet, int row, int endExpertiseIndex, int otherExpertiseIndex)
+        {
+            string expertise = string.Empty;
+            for (int i = 5; i <= endExpertiseIndex; i++)
+            {
+                if (sheet.Range[row, i].Value.Trim().StartsWith("■"))
+                {
+                    expertise += sheet.Range[row, i].Value.Trim().RemoveStartsWithDelimiter("■") + ",";
+                }
+            }
+
+            expertise += sheet.Range[row, otherExpertiseIndex].Value.Trim();
+            expertise = expertise.RemoveEndWithDelimiter(",");
+
+            return expertise;
         }
 
         /// <summary>
