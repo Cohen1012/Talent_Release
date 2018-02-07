@@ -153,7 +153,7 @@ namespace TalentWindowsFormsApp
                     {
                         Size = new System.Drawing.Size(134, 22),
                         Text = dr["Code_Id"].ToString(),
-                        Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)))
+                        Font = new Font("新細明體", 9F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(136)))
                     };
                     code.Location = i == 0 ? new Point(98, 42) : new Point(98, CodeTxt[CodeTxt.Count - 1].Top + 29);
                     CodeTxt.Add(code);
@@ -178,7 +178,7 @@ namespace TalentWindowsFormsApp
         }
 
         /// <summary>
-        /// 創建面談資料TabPages
+        /// 根據DB資料創建面談資料TabPages
         /// </summary>
         /// <param name="dt"></param>
         private void CreateInterviewPages(DataTable dt)
@@ -191,6 +191,7 @@ namespace TalentWindowsFormsApp
 
             if (dt.Rows.Count == 0)
             {
+                //this.tabControl1.TabPages.Add("+");
                 return;
             }
 
@@ -209,10 +210,12 @@ namespace TalentWindowsFormsApp
                 tabControl1.TabPages.Add(tabPage);
                 tabPage.Controls.Add(newInterview);
             }
+
+            //this.tabControl1.TabPages.Add("+");
         }
 
         /// <summary>
-        /// 新增一個面談資料頁面
+        /// 新增一個面談資料頁面TabPage
         /// </summary>
         private void NewInterviewPage()
         {
@@ -308,6 +311,8 @@ namespace TalentWindowsFormsApp
                 ShowData();
                 PaitDataGridView();
             }
+
+
         }
 
         private void ContactStatus_Load(object sender, EventArgs e)
@@ -394,6 +399,11 @@ namespace TalentWindowsFormsApp
                 this.ContactStausCombo.Size = r.Size;
                 this._CheckChange = true;
                 this.ContactStausCombo.Text = this.dataGridView1.CurrentCell.Value.ToString();
+                if (string.IsNullOrEmpty(this.ContactStausCombo.Text))
+                {
+                    this.ContactStausCombo.Text = "(無)";
+                }
+
                 this._CheckChange = false;
                 this.ContactStausCombo.Visible = true;
                 this.ContactStausCombo.BringToFront();
@@ -544,7 +554,7 @@ namespace TalentWindowsFormsApp
                 return;
             }
             string msg = string.Empty;
-            msg = this.ValidCode();
+            msg = TalentValid.GetInstance().ValidCode(CodeTxt);
             if (msg != string.Empty)
             {
                 MessageBox.Show(msg, "錯誤訊息");
@@ -575,14 +585,14 @@ namespace TalentWindowsFormsApp
                 }
             }
 
-            msg = Talent.GetInstance().ValidContactSituationInfoData(name, codeList, sex, mail, phone, place, skill, cooperationMode, status);
+            msg = TalentValid.GetInstance().ValidContactSituationInfoData(name, codeList, sex, mail, phone, place, skill, cooperationMode, status);
             if (msg != string.Empty)
             {
                 MessageBox.Show(msg, "錯誤訊息");
                 return;
             }
 
-            msg = Talent.GetInstance().ValidContactSituationData(ContactStatusUI);
+            msg = TalentValid.GetInstance().ValidContactSituationData(ContactStatusUI);
             if (msg != string.Empty)
             {
                 MessageBox.Show(msg, "錯誤訊息");
@@ -653,41 +663,31 @@ namespace TalentWindowsFormsApp
             PaitDataGridView();
         }
 
-        /// <summary>
-        /// 檢查代碼正確性
-        /// </summary>
-        /// <returns></returns>
-        private string ValidCode()
+        private void tabControl1_MouseDown(object sender, MouseEventArgs e)
         {
-            string msg = string.Empty;
-            ////如果代碼超過兩筆則要檢查不能為空值
-            if (CodeTxt.Count > 1)
-            {
-                foreach (TextBox code in CodeTxt)
-                {
-                    if (code.Text == string.Empty)
-                    {
-                        msg = "代碼不可為空值";
-                        return msg;
-                    }
-                }
-            }
+            ////if (Contact_Id == string.Empty)
+            ////{
+            ////    MessageBox.Show("沒有聯繫資料!!!", "警告");
+            ////    return;
+            ////}
 
-            ////檢查代碼是否重複
-            var isdifference = (from code in CodeTxt
-                                group code by new
-                                {
-                                    Code_Id = code.Text
-                                } into g
-                                where g.Count() > 1
-                                select g.Key).ToList();
-            if (isdifference.Count > 0)
-            {
-                msg = "輸入重複的代碼";
-                return msg;
-            }
-
-            return msg;
+            ////int lastIndex = this.tabControl1.TabCount - 1;
+            ////if (this.tabControl1.GetTabRect(lastIndex).Contains(e.Location))
+            ////{
+            ////    TabPage tabPage = new TabPage
+            ////    {
+            ////        Text = "面談資料" + (tabControl1.TabCount - 1),
+            ////        Name = "Interview" + (tabControl1.TabCount - 1),
+            ////        AutoScroll = true,
+            ////    };
+            ////    InterviewDataControl newInterview = new InterviewDataControl();
+            ////    newInterview.BtnClick += DelInterview_BtnClick;
+            ////    newInterview.ConfirmBtnClick += UpdateTime_ConfirmBtnClick;
+            ////    newInterview.SetInfo(NameTxt.Text, SexCombo.SelectedItem.ToString(), MailTxt.Text, PhoneTxt.Text, Contact_Id);
+            ////    tabPage.Controls.Add(newInterview);
+            ////    this.tabControl1.TabPages.Insert(lastIndex, tabPage);
+            ////    this.tabControl1.SelectedIndex = lastIndex;
+            ////}
         }
 
         /// <summary>
@@ -697,11 +697,20 @@ namespace TalentWindowsFormsApp
         /// <param name="e"></param>
         private void tabControl1_Selecting(object sender, TabControlCancelEventArgs e)
         {
+            //if(tabControl1.SelectedIndex == tabControl1.TabCount - 1)
+            //{
+            //    e.Cancel = true;
+            //    return;
+            //}
+
             if (this.Page != 0)
             {
                 ////面談資料頁面間轉換要檢查是否有存檔
                 InterviewDataControl interviewDataControl = new InterviewDataControl();
                 TabPage tabPage = tabControl1.TabPages["Interview" + Page];
+
+                
+
                 foreach (Control c in tabPage.Controls)
                 {
                     if (c is InterviewDataControl)
@@ -894,13 +903,13 @@ namespace TalentWindowsFormsApp
             switch (exportMode)
             {
                 case "聯繫狀況":
-                    msg = Talent.GetInstance().ExportContactSituationDataByContactId(idList, path);
+                    msg = TalentCommon.GetInstance().ExportContactSituationDataByContactId(idList, path);
                     break;
                 case "面談資料":
-                    msg = Talent.GetInstance().ExportInterviewDataByContactId(idList, path);
+                    msg = TalentCommon.GetInstance().ExportInterviewDataByContactId(idList, path);
                     break;
                 case "所有資料":
-                    msg = Talent.GetInstance().ExportAllDataByContactId(idList, path);
+                    msg = TalentCommon.GetInstance().ExportAllDataByContactId(idList, path);
                     break;
                 default:
                     msg = "沒有匯出任何資料";
@@ -913,7 +922,7 @@ namespace TalentWindowsFormsApp
         private void ImportLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
 
-            if(tabControl1.SelectedIndex == 0)
+            if (tabControl1.SelectedIndex == 0)
             {
                 return;
             }
@@ -924,7 +933,7 @@ namespace TalentWindowsFormsApp
                 return;
             }
 
-                OpenFileDialog ofd = new OpenFileDialog
+            OpenFileDialog ofd = new OpenFileDialog
             {
                 Title = "請選擇欲上傳的面談資料Excel",
                 Filter = @"Excel Files|*.xlsx",

@@ -228,6 +228,12 @@ namespace TalentClassLibrary
                 workbook.LoadFromFile(path);
                 Worksheet sheet = workbook.Worksheets[0];
                 DataTable dt = sheet.ExportDataTable();
+                if (!TalentValid.GetInstance().ValidIsOldTalentFormat(dt.Columns))
+                {
+                    ErrorMessage = "excel格式不符";
+                    return contactSituationList;
+                }
+
                 if (dt.Rows.Count == 0)
                 {
                     ErrorMessage = "空的excel";
@@ -319,6 +325,13 @@ namespace TalentClassLibrary
                 workbook.LoadFromFile(path);
                 Worksheet sheet = workbook.Worksheets[0];
                 DataTable dt = sheet.ExportDataTable();
+
+                if(!TalentValid.GetInstance().ValidIsNewTalentFormat(dt.Columns))
+                {
+                    ErrorMessage = "excel格式不符";
+                    return contactSituationList;
+                }
+
                 if (dt.Rows.Count == 0)
                 {
                     ErrorMessage = "空的excel";
@@ -480,7 +493,7 @@ namespace TalentClassLibrary
                                     }
                                     else
                                     {
-                                        msg = Talent.GetInstance().ValidContactStatus(dt.Rows[i].ItemArray[z].ToString().Trim());
+                                        msg = TalentValid.GetInstance().ValidContactStatus(dt.Rows[i].ItemArray[z].ToString().Trim());
                                         if (msg != string.Empty)
                                         {
                                             contactSituationList.Clear();

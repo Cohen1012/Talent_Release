@@ -8,6 +8,9 @@ namespace TalentClassLibrary.Model
 {
     public class Models
     {
+        /// <summary>
+        /// 聯繫裝況
+        /// </summary>
         public List<string> Contact_Status = new List<string>() { "(無)", "人才儲存", "1111邀約", "104邀約", "mail邀約", "感謝函", "電話聯繫", "電聯未接", "技術訪談", "暫不考慮", "信件聯繫", "婉拒邀約", "同意邀約", "詢問問題", "主動應徵", "取消面談", "面談未到", "關閉履歷", "履歷部分公開", "人資系統資料" };
     }
 
@@ -438,7 +441,7 @@ namespace TalentClassLibrary.Model
         /// <summary>
         /// 面談評語
         /// </summary>
-        public  List<InterviewComments> InterviewCommentsList { get; set; }
+        public List<InterviewComments> InterviewCommentsList { get; set; }
     }
 
     /// <summary>

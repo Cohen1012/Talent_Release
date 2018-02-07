@@ -296,13 +296,13 @@ namespace TalentWindowsFormsApp
             switch (exportMode)
             {
                 case "聯繫狀況":
-                    msg = Talent.GetInstance().ExportContactSituationDataByContactId(idList, path);
+                    msg = TalentCommon.GetInstance().ExportContactSituationDataByContactId(idList, path);
                     break;
                 case "面談資料":
-                    msg = Talent.GetInstance().ExportInterviewDataByContactId(idList, path);
+                    msg = TalentCommon.GetInstance().ExportInterviewDataByContactId(idList, path);
                     break;
                 case "所有資料":
-                    msg = Talent.GetInstance().ExportAllDataByContactId(idList, path);
+                    msg = TalentCommon.GetInstance().ExportAllDataByContactId(idList, path);
                     break;
                 default:
                     msg = "沒有匯出任何資料";

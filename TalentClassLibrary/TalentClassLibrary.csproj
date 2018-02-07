@@ -111,7 +111,10 @@
     <Compile Include="SQL.cs" />
     <Compile Include="Talent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TalentCommon.cs" />
+    <Compile Include="TalentFiles.cs" />
     <Compile Include="TalentSearch.cs" />
+    <Compile Include="TalentValid.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

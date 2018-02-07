@@ -190,7 +190,7 @@ namespace TalentWindowsFormsApp
                 {
                     if (dataGridView2.Rows[e.RowIndex].Cells[i].Value.ToString().Contains("@"))
                     {
-                        string msg = Talent.GetInstance().AlertUpdatePassword(dataGridView2.Rows[e.RowIndex].Cells[i].Value.ToString());
+                        string msg = TalentCommon.GetInstance().AlertUpdatePassword(dataGridView2.Rows[e.RowIndex].Cells[i].Value.ToString());
                         if (msg != "寄送成功")
                         {
                             MessageBox.Show(msg, "錯誤訊息");

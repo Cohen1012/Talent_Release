@@ -128,7 +128,7 @@ namespace TalentWindowsFormsApp
             };
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-                string msg = Talent.GetInstance().DownloadFile(FilePath, sfd.FileName);
+                string msg = TalentFiles.GetInstance().DownloadFile(FilePath, sfd.FileName);
                 MessageBox.Show(msg,"訊息");
             }
         }

@@ -156,7 +156,7 @@ namespace TalentWindowsFormsApp
             UpdateInterviewPage(ds);
             UpdateInterviewResult(ds);
             UpdateProjectExperience(ds);            
-            ////
+            ////要保留原本DB的資料
             InterviewInfoDB = dataSet.Tables[0].Copy();
             InterviewCommentsDB = dataSet.Tables[1].Copy();
             InterviewResultDB = dataSet.Tables[2].Copy();
@@ -512,8 +512,11 @@ namespace TalentWindowsFormsApp
                     {
                         if (expertiseCheckedListBox.Items[j].ToString() == expertise[i])
                         {
-                            expertiseCheckedListBox.SetItemChecked(j, true);
-                            break;
+                            if (!expertiseCheckedListBox.GetItemChecked(j))
+                            {
+                                expertiseCheckedListBox.SetItemChecked(j, true);
+                                break;
+                            }
                         }
 
                         if (j == expertiseCheckedListBox.Items.Count - 1)
@@ -688,7 +691,7 @@ namespace TalentWindowsFormsApp
                 this.GraduationCombo.Size = r.Size;
                 this.GraduationCombo.Height = EducationGrid.Height;
                 this.EducationCheckChange = true;
-                this.GraduationCombo.Text = this.EducationGrid.CurrentCell.Value.ToString();
+                this.GraduationCombo.Text = string.IsNullOrEmpty(this.EducationGrid.CurrentCell.Value.ToString())?"畢業" : this.EducationGrid.CurrentCell.Value.ToString();
                 this.EducationCheckChange = false;
                 this.GraduationCombo.Visible = true;
                 this.GraduationCombo.BringToFront();
@@ -732,7 +735,8 @@ namespace TalentWindowsFormsApp
                 this.AbilityCombo.Size = r.Size;
                 this.AbilityCombo.Height = LanguageGrid.Height;
                 this.LanguageCheckChange = true;
-                this.AbilityCombo.Text = LanguageGrid.CurrentCell.Value.ToString();
+                this.AbilityCombo.Text = string.IsNullOrEmpty(LanguageGrid.CurrentCell.Value.ToString())? "略": LanguageGrid.CurrentCell.Value.ToString();
+                
                 this.LanguageCheckChange = false;
                 this.AbilityCombo.Visible = true;
                 this.AbilityCombo.BringToFront();
@@ -1074,7 +1078,7 @@ namespace TalentWindowsFormsApp
                 projectExperienceUIList.Add(project);
             }
 
-            if (Talent.GetInstance().ValidProjectExperienceData(projectExperienceUIList) != string.Empty)
+            if (TalentValid.GetInstance().ValidProjectExperienceData(projectExperienceUIList) != string.Empty)
             {
                 DialogResult result1 = MessageBox.Show("有空的專案經驗是否儲存?", "警告", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (result1 == DialogResult.No)
@@ -1083,7 +1087,7 @@ namespace TalentWindowsFormsApp
                 }
             }
 
-            validMsg = Talent.GetInstance().ValidProjectExperienceIsRepeat(projectExperienceUIList.ListToDataTable());
+            validMsg = TalentValid.GetInstance().ValidProjectExperienceIsRepeat(projectExperienceUIList.ListToDataTable());
             if (validMsg != string.Empty)
             {
                 msg += validMsg + "\n";
@@ -1092,7 +1096,7 @@ namespace TalentWindowsFormsApp
             ////驗證面談基本資料
             InterviewInfo interviewInfoUI = this.CreateUIInterviewInfo();
             interviewInfoUI.Image = string.IsNullOrEmpty(pictureBox1.ImageLocation) ? string.Empty : pictureBox1.ImageLocation;
-            validMsg = Talent.GetInstance().ValidInterviewInfoData(interviewInfoUI.Vacancies,
+            validMsg = TalentValid.GetInstance().ValidInterviewInfoData(interviewInfoUI.Vacancies,
                 interviewInfoUI.Name, interviewInfoUI.Married, interviewInfoUI.Interview_Date,
                 interviewInfoUI.Sex, interviewInfoUI.Mail, interviewInfoUI.Birthday,
                 interviewInfoUI.CellPhone, interviewInfoUI.Image);
@@ -1212,7 +1216,7 @@ namespace TalentWindowsFormsApp
                 InterviewInfo interviewInfoUI = this.CreateUIInterviewInfo();
                 interviewInfoUI.Image = string.IsNullOrEmpty(pictureBox1.ImageLocation) ? string.Empty : pictureBox1.ImageLocation;
 
-                msg = Talent.GetInstance().ValidInterviewInfoData(interviewInfoUI.Vacancies,
+                msg = TalentValid.GetInstance().ValidInterviewInfoData(interviewInfoUI.Vacancies,
                     interviewInfoUI.Name, interviewInfoUI.Married, interviewInfoUI.Interview_Date,
                     interviewInfoUI.Sex, interviewInfoUI.Mail, interviewInfoUI.Birthday,
                     interviewInfoUI.CellPhone, interviewInfoUI.Image);
@@ -1266,7 +1270,7 @@ namespace TalentWindowsFormsApp
                 InterviewInfo interviewInfoUI = this.CreateUIInterviewInfo();
                 interviewInfoUI.Image = string.IsNullOrEmpty(pictureBox1.ImageLocation) ? string.Empty : pictureBox1.ImageLocation;
 
-                msg = Talent.GetInstance().ValidInterviewInfoData(interviewInfoUI.Vacancies,
+                msg = TalentValid.GetInstance().ValidInterviewInfoData(interviewInfoUI.Vacancies,
                     interviewInfoUI.Name, interviewInfoUI.Married, interviewInfoUI.Interview_Date,
                     interviewInfoUI.Sex, interviewInfoUI.Mail, interviewInfoUI.Birthday,
                     interviewInfoUI.CellPhone, interviewInfoUI.Image);
@@ -1333,7 +1337,7 @@ namespace TalentWindowsFormsApp
                 projectExperienceUIList.Add(project);
             }
 
-            if (Talent.GetInstance().ValidProjectExperienceData(projectExperienceUIList) != string.Empty)
+            if (TalentValid.GetInstance().ValidProjectExperienceData(projectExperienceUIList) != string.Empty)
             {
                 DialogResult result1 = MessageBox.Show("有空的專案經驗是否儲存?", "警告", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (result1 == DialogResult.No)
@@ -1342,7 +1346,7 @@ namespace TalentWindowsFormsApp
                 }
             }
 
-            msg = Talent.GetInstance().ValidProjectExperienceIsRepeat(projectExperienceUIList.ListToDataTable());
+            msg = TalentValid.GetInstance().ValidProjectExperienceIsRepeat(projectExperienceUIList.ListToDataTable());
             if (msg != string.Empty)
             {
                 MessageBox.Show(msg, "錯誤訊息");
@@ -1804,6 +1808,11 @@ namespace TalentWindowsFormsApp
                 this.UpdateTimeClick(e);
                 files.Close();
             }
+        }
+
+        private void AdressTxt_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

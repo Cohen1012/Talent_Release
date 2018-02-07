@@ -17,6 +17,9 @@ using System.Diagnostics;
 
 namespace TalentClassLibrary
 {
+    /// <summary>
+    /// 操作資料庫類別
+    /// </summary>
     public class Talent : SQL
     {
         private static Talent talent = new Talent();
@@ -27,30 +30,6 @@ namespace TalentClassLibrary
         /// 紀錄大略發生的錯誤
         /// </summary>
         public string ErrorMessage { get; set; }
-
-        /// <summary>
-        /// 寄送重製密碼的信件
-        /// </summary>
-        /// <param name="account">欲提醒更換密碼的信箱</param>
-        /// <returns>寄送成功or失敗</returns>
-        public string AlertUpdatePassword(string account)
-        {
-            string newPassword = Common.GetInstance().GetRandomPassword(6);
-            if (this.UpdatePasswordByaccount(account, newPassword) != "修改成功")
-            {
-                return "密碼重設失敗";
-            }
-
-            string mailFrom = "williamlai@is-land.com.tw";
-            string mailPwd = "x9454jo6";
-            string mailTo = account;
-            string mailCc = string.Empty;
-            string mailBcc = string.Empty;
-            string mailSub = "[人才資料庫] 重設密碼通知";
-            string mailBody = "<html><head></head><body><p>Dears</p><p>重設後的密碼如下：</p><p>" + newPassword + "</p></body></html>";
-            string msg = Common.GetInstance().SendMail(mailFrom, mailPwd, "smtp.gmail.com", mailTo, mailCc, mailBcc, mailSub, mailBody);
-            return msg;
-        }
 
         /// <summary>
         /// 刪除指定的面談資料
@@ -70,7 +49,7 @@ namespace TalentClassLibrary
                 return "圖片刪除失敗";
             }
 
-            if (this.DelFilesByInterviewId(interviewId) == "附加檔案刪除失敗")
+            if (TalentFiles.GetInstance().DelFilesByInterviewId(interviewId) == "附加檔案刪除失敗")
             {
                 return "附加檔案刪除失敗";
             }
@@ -641,170 +620,6 @@ namespace TalentClassLibrary
         }
 
         /// <summary>
-        /// 下載附加檔案
-        /// </summary>
-        /// <param name="serverPath">伺服器端的檔案路徑</param>
-        /// <param name="clientPath">存檔的路徑</param>
-        /// <returns></returns>
-        public string DownloadFile(string serverPath, string clientPath)
-        {
-            string msg = Valid.GetInstance().ValidFilePath(serverPath);
-            if (msg != string.Empty)
-            {
-                return "不存在的路徑";
-            }
-
-            try
-            {
-                using (Stream stream = File.Open(serverPath, FileMode.Open))
-                {
-                    using (FileStream fs = new FileStream(clientPath, FileMode.OpenOrCreate))
-                    {
-                        stream.CopyTo(fs);
-                        fs.Flush();
-                    }
-                }
-
-                return "下載成功";
-            }
-            catch (Exception ex)
-            {
-                LogInfo.WriteErrorInfo(ex);
-                return "下載失敗";
-            }
-
-        }
-
-        /// <summary>
-        /// 將附加檔案上傳到Server
-        /// </summary>
-        /// <param name="files">附加檔案</param>
-        /// <param name="interviewId">面談ID</param>
-        /// <param name="attachedFileMode">附加檔案模式</param>
-        /// <returns></returns>
-        public List<string> SaveAttachedFiles(List<string> files, string interviewId, string attachedFileMode)
-        {
-            List<string> serverFilePathList = new List<string>();
-            try
-            {
-                //// 檢查 Server 上該資料夾是否存在，不存在就建立
-                string serverDir = @".\files\" + interviewId + @"\" + attachedFileMode;
-                if (Directory.Exists(serverDir) == false)
-                {
-                    Directory.CreateDirectory(serverDir);
-                }
-
-                CheckDBFileIsExists(files, serverDir);
-
-                foreach (string path in files)
-                {
-                    ////組合出完整路徑
-                    string serverFilePath = Path.Combine(serverDir, Path.GetFileName(path));
-                    ////目錄相同代表相同檔案，不做事
-                    if (path.Equals(serverFilePath))
-                    {
-                        serverFilePathList.Add(serverFilePath);
-                        continue;
-                    }
-
-                    using (Stream stream = File.Open(path, FileMode.Open, FileAccess.Read))
-                    {
-                        using (FileStream fs = new FileStream(serverFilePath, FileMode.OpenOrCreate))
-                        {
-                            stream.CopyTo(fs);
-                            fs.Flush();
-                        }
-                    }
-
-                    serverFilePathList.Add(serverFilePath);
-                }
-
-                return serverFilePathList;
-            }
-            catch (Exception ex)
-            {
-                LogInfo.WriteErrorInfo(ex);
-                serverFilePathList.Clear();
-                serverFilePathList.Add("上傳失敗");
-                return serverFilePathList;
-            }
-        }
-
-        /// <summary>
-        /// 檢查目錄的檔案與UI的檔案，如果目錄的檔案沒出現在UI的檔案中就刪除之
-        /// </summary>
-        /// <param name="files">UI檔案</param>
-        /// <param name="serverDir">DB檔案存在的目錄</param>
-        private void CheckDBFileIsExists(List<string> files, string serverDir)
-        {
-            foreach (string fileNameDB in Directory.GetFiles(serverDir))
-            {
-                bool isExists = false;
-                foreach (string path in files)
-                {
-                    string fileNameUI = Path.GetFileName(path);
-                    if (fileNameUI.Equals(Path.GetFileName(fileNameDB)))
-                    {
-                        isExists = true;
-                        break;
-                    }
-                }
-
-                if (isExists == false)
-                {
-                    File.Delete(fileNameDB);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 上傳照片
-        /// </summary>
-        /// <param name="path">本機端路徑</param>
-        /// <param name="interviewId">面談ID</param>
-        /// <returns></returns>
-        public string UpLoadImage(string path, string interviewId)
-        {
-            string msg = Valid.GetInstance().ValidFilePath(path);
-            if (msg != string.Empty)
-            {
-                return "不存在的路徑";
-            }
-
-            try
-            {
-                ////取得副檔名
-                string extension = Path.GetExtension(path).ToLowerInvariant();
-                // 檢查 Server 上該資料夾是否存在，不存在就自動建立
-                string serverDir = @".\images";
-                if (Directory.Exists(serverDir) == false)
-                {
-                    Directory.CreateDirectory(serverDir);
-                }
-
-                ////將檔名以面談ID命名
-                string fileName = string.Format("{0}{1}", interviewId, extension);
-                ////組合出完整路徑
-                string serverFilePath = Path.Combine(serverDir, fileName);
-
-                using (Stream stream = File.Open(path, FileMode.Open, FileAccess.Read))
-                {
-                    using (FileStream fs = new FileStream(serverFilePath, FileMode.OpenOrCreate))
-                    {
-                        stream.CopyTo(fs);
-                        fs.Flush();
-                    }
-                }
-                return serverFilePath;
-            }
-            catch (Exception ex)
-            {
-                LogInfo.WriteErrorInfo(ex);
-                return "上傳失敗";
-            }
-        }
-
-        /// <summary>
         /// 將附加檔案資訊寫入資料庫
         /// </summary>
         /// <param name="files"></param>
@@ -814,7 +629,7 @@ namespace TalentClassLibrary
         public string SaveAttachedFilesToDB(List<string> files, string interviewId, string attachedFileMode)
         {
             string sqlStr = string.Empty;
-            List<string> path = this.SaveAttachedFiles(files, interviewId, attachedFileMode);
+            List<string> path = TalentFiles.GetInstance().SaveAttachedFiles(files, interviewId, attachedFileMode);
             if (path.Contains("上傳失敗"))
             {
                 return "檔案上傳失敗";
@@ -985,7 +800,7 @@ namespace TalentClassLibrary
                         interviewId = cmd.ExecuteScalar().ToString();
                         if (!string.IsNullOrEmpty(dr["Image"].ToString()))
                         {
-                            string path = this.UpLoadImage(dr["Image"].ToString(), interviewId);
+                            string path = TalentFiles.GetInstance().UpLoadImage(dr["Image"].ToString(), interviewId);
                             if (path.Equals("上傳失敗") || path.Equals("不存在的路徑"))
                             {
                                 throw new Exception(path);
@@ -1092,7 +907,7 @@ namespace TalentClassLibrary
                     return msg;
                 }
 
-                account = AddMailFormat(account);
+                account =  TalentCommon.GetInstance().AddMailFormat(account);
                 string[] splitAccount = account.Split('@');
                 string password = Common.GetInstance().PasswordEncryption(splitAccount[0].ToLower());
                 string insert = @"insert into Member (Account,Password,States) values (@account,@password,N'啟用')";
@@ -1110,32 +925,6 @@ namespace TalentClassLibrary
                 LogInfo.WriteErrorInfo(ex);
                 this.RollbackTransaction();
                 return "新增失敗";
-            }
-        }
-
-        /// <summary>
-        /// 驗證是否為本公司之帳號
-        /// </summary>
-        /// <param name="account">帳號</param>
-        /// <returns>回傳空值代表沒有錯誤，若不是本公司之帳號則回傳"帳號須為本公司之帳號"</returns>
-        public string ValidIsCompanyMail(string account)
-        {
-            string msg = string.Empty;
-            try
-            {
-                string[] splitAccount = account.Split('@');
-                if (!splitAccount[1].Equals("is-land.com.tw"))
-                {
-                    msg = "帳號須為本公司之帳號";
-                }
-
-                return msg;
-            }
-            catch (Exception ex)
-            {
-                LogInfo.WriteErrorInfo(ex);
-                msg = "帳號須為本公司之帳號";
-                return msg;
             }
         }
 
@@ -1432,8 +1221,8 @@ namespace TalentClassLibrary
                         }
                     }
 
-                    da.SelectCommand.Parameters.Add("@CooperationMode", SqlDbType.NChar).Value = this.ValueIsAny(cooperationMode);
-                    da.SelectCommand.Parameters.Add("@status", SqlDbType.NChar).Value = this.ValueIsAny(states);
+                    da.SelectCommand.Parameters.Add("@CooperationMode", SqlDbType.NChar).Value = TalentCommon.GetInstance().ValueIsAny(cooperationMode);
+                    da.SelectCommand.Parameters.Add("@status", SqlDbType.NChar).Value = TalentCommon.GetInstance().ValueIsAny(states);
                     da.SelectCommand.Parameters.Add("@startEditDate", SqlDbType.DateTime).Value = Common.GetInstance().ValueIsNullOrEmpty(startEditDate);
                     da.SelectCommand.Parameters.Add("@endEditDate", SqlDbType.DateTime).Value = Common.GetInstance().ValueIsNullOrEmpty(endEditDate);
 
@@ -1505,7 +1294,7 @@ namespace TalentClassLibrary
                         da.SelectCommand.CommandType = CommandType.StoredProcedure;
                         da.SelectCommand.CommandText = "KeyWordSearch";
                         da.SelectCommand.Parameters.Add("@KeyWord", SqlDbType.NVarChar).Value = word;
-                        this.ClearDataTable(dt);
+                        Common.GetInstance().ClearDataTable(dt);
                         da.Fill(dt);
                         if (dt.Rows.Count > 0)
                         {
@@ -1685,7 +1474,7 @@ namespace TalentClassLibrary
                 }
             }
 
-            this.ClearDataTable(dt);
+            Common.GetInstance().ClearDataTable(dt);
             if (da.SelectCommand.CommandText.EndsWith(" UNION "))
             {
                 da.SelectCommand.CommandText = da.SelectCommand.CommandText.Remove(da.SelectCommand.CommandText.Length - 7);
@@ -1701,18 +1490,6 @@ namespace TalentClassLibrary
             }
 
             return idList;
-        }
-
-        /// <summary>
-        /// 將DataTable清空
-        /// </summary>
-        /// <param name="dt">欲清空的DataTable</param>
-        /// <returns>空的DataTable</returns>
-        private DataTable ClearDataTable(DataTable dt)
-        {
-            dt.Columns.Clear();
-            dt.Clear();
-            return dt;
         }
 
         /// <summary>
@@ -1812,185 +1589,6 @@ namespace TalentClassLibrary
                 }
 
                 dt.Rows.Add(row1);
-            }
-        }
-
-        /// <summary>
-        /// 根據聯繫ID匯出所有資料
-        /// </summary>
-        /// <param name="contactIdList"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public string ExportAllDataByContactId(List<string> contactIdList, string path)
-        {
-            try
-            {
-                for (int i = 0; i < contactIdList.Count; i++)
-                {
-                    List<ContactSituation> ContactSituationList = new List<ContactSituation>(); ////聯繫狀況資料
-                    List<InterviewData> interviewDataList = new List<InterviewData>(); ///面談資料清單
-                    ContactSituation contactSituation = new ContactSituation();
-                    DataSet ds = this.SelectContactSituationDataById(contactIdList[i]);
-                    contactSituation.Info = ds.Tables[0].DBNullToEmpty().DataTableToList<ContactInfo>()[0];
-                    contactSituation.Status = ds.Tables[1].DataTableToList<ContactStatus>();
-                    string codeList = string.Empty;
-                    foreach (DataRow dr in ds.Tables[2].Rows)
-                    {
-                        codeList += dr[0].ToString() + "\n";
-                    }
-
-                    contactSituation.Code = codeList;
-                    ContactSituationList.Add(contactSituation);
-                    List<string> interviewIdList = new List<string>();
-                    foreach (DataRow dr in ds.Tables[4].Rows)
-                    {
-                        interviewIdList.Add(dr[0].ToString());
-                    }
-
-                    foreach (string interviewId in interviewIdList)
-                    {
-                        InterviewResults interviewResults = new InterviewResults();
-                        InterviewData interviewData = new InterviewData();
-                        DataSet interviewDataSet = this.SelectInterviewDataById(interviewId);
-                        List<InterviewInfo> interviewInfo = interviewDataSet.Tables[0].DataTableToList<InterviewInfo>(); ////面談基本資料
-                        List<InterviewComments> interviewCommentsList = interviewDataSet.Tables[1].DataTableToList<InterviewComments>(); ////面談評語
-                        List<InterviewResult> interviewResult = interviewDataSet.Tables[2].DataTableToList<InterviewResult>(); ////面談結果(任用評定與備註)
-
-                        interviewResults.InterviewResult = interviewResult[0];
-                        interviewResults.InterviewCommentsList = interviewCommentsList;
-
-                        List<ProjectExperience> projectExperienceList = interviewDataSet.Tables[3].DataTableToList<ProjectExperience>(); ////專案經驗
-
-                        interviewData.InterviewInfo = interviewInfo[0];
-                        interviewData.InterviewResults = interviewResults;
-                        interviewData.ProjectExperienceList = projectExperienceList;
-                        interviewDataList.Add(interviewData);
-                    }
-
-                    string msg = ExcelHelper.GetInstance().ExportAllData(ContactSituationList, interviewDataList, path, i + 1);
-                    if (msg != "匯出成功")
-                    {
-                        return "匯出失敗";
-                    }
-                }
-
-                return "匯出成功";
-            }
-            catch (Exception ex)
-            {
-                LogInfo.WriteErrorInfo(ex);
-                return "匯出失敗";
-            }
-        }
-
-        /// <summary>
-        /// 根據聯繫ID匯出面談資料
-        /// </summary>
-        /// <param name="contactIdList"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public string ExportInterviewDataByContactId(List<string> contactIdList, string path)
-        {
-            bool isAllExport = true; ////紀錄是否有資料沒有面談資料
-            try
-            {
-                for (int i = 0; i < contactIdList.Count; i++)
-                {
-                    List<InterviewData> interviewDataList = new List<InterviewData>(); ///面談資料清單
-                    DataSet ds = this.SelectContactSituationDataById(contactIdList[i]);
-                    List<string> interviewIdList = new List<string>();
-                    foreach (DataRow dr in ds.Tables[4].Rows)
-                    {
-                        interviewIdList.Add(dr[0].ToString());
-                    }
-
-                    ////代表沒有面談資料
-                    if (interviewIdList.Count == 0)
-                    {
-                        isAllExport = false;
-                        continue;
-                    }
-
-                    foreach (string interviewId in interviewIdList)
-                    {
-                        InterviewResults interviewResults = new InterviewResults();
-                        InterviewData interviewData = new InterviewData();
-                        DataSet interviewDataSet = this.SelectInterviewDataById(interviewId);
-                        List<InterviewInfo> interviewInfo = interviewDataSet.Tables[0].DataTableToList<InterviewInfo>(); ////面談基本資料
-                        List<InterviewComments> interviewCommentsList = interviewDataSet.Tables[1].DataTableToList<InterviewComments>(); ////面談評語
-                        List<InterviewResult> interviewResult = interviewDataSet.Tables[2].DataTableToList<InterviewResult>(); ////面談結果(任用評定與備註)
-
-                        interviewResults.InterviewResult = interviewResult[0];
-                        interviewResults.InterviewCommentsList = interviewCommentsList;
-
-                        List<ProjectExperience> projectExperienceList = interviewDataSet.Tables[3].DataTableToList<ProjectExperience>(); ////專案經驗
-
-                        interviewData.InterviewInfo = interviewInfo[0];
-                        interviewData.InterviewResults = interviewResults;
-                        interviewData.ProjectExperienceList = projectExperienceList;
-                        interviewDataList.Add(interviewData);
-                    }
-
-                    string msg = ExcelHelper.GetInstance().ExportInterviewData(interviewDataList, path, i + 1);
-                    if (msg != "匯出成功")
-                    {
-                        return "匯出失敗";
-                    }
-                }
-
-                if (!isAllExport)
-                {
-                    return "匯出成功，但有些資料沒有面談資料";
-                }
-
-                return "匯出成功";
-            }
-            catch (Exception ex)
-            {
-                LogInfo.WriteErrorInfo(ex);
-                return "匯出失敗";
-            }
-        }
-
-        /// <summary>
-        /// 根據聯繫ID匯出聯繫資料
-        /// </summary>
-        /// <param name="contactIdList"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public string ExportContactSituationDataByContactId(List<string> contactIdList, string path)
-        {
-            List<ContactSituation> ContactSituationList = new List<ContactSituation>();
-            try
-            {
-                foreach (string contactId in contactIdList)
-                {
-                    ContactSituation contactSituation = new ContactSituation();
-                    DataSet ds = this.SelectContactSituationDataById(contactId);
-                    contactSituation.Info = ds.Tables[0].DBNullToEmpty().DataTableToList<ContactInfo>()[0];
-                    contactSituation.Status = ds.Tables[1].DataTableToList<ContactStatus>();
-                    string codeList = string.Empty;
-                    foreach (DataRow dr in ds.Tables[2].Rows)
-                    {
-                        codeList += dr[0].ToString() + "\n";
-                    }
-
-                    contactSituation.Code = codeList;
-                    ContactSituationList.Add(contactSituation);
-                }
-
-                string msg = ExcelHelper.GetInstance().ExportMultipleContactSituation(ContactSituationList, path);
-                if (msg != "匯出成功")
-                {
-                    return "匯出失敗";
-                }
-
-                return "匯出成功";
-            }
-            catch (Exception ex)
-            {
-                LogInfo.WriteErrorInfo(ex);
-                return "匯出失敗";
             }
         }
 
@@ -2219,7 +1817,7 @@ namespace TalentClassLibrary
         {
             ErrorMessage = string.Empty;
             string msg = "登入失敗";
-            account = AddMailFormat(account);
+            account = TalentCommon.GetInstance().AddMailFormat(account);
             password = Common.GetInstance().PasswordEncryption(password.ToLower());
             string select = @"select Account,States from Member where Account=@account and Password = @password";
             DataTable dt = new DataTable();
@@ -2237,7 +1835,7 @@ namespace TalentClassLibrary
                         return msg;
                     }
                 }
-                if (this.ValidMemberStates(dt.Rows[0][1].ToString()))
+                if (TalentValid.GetInstance().ValidMemberStates(dt.Rows[0][1].ToString()))
                 {
                     return dt.Rows[0][0].ToString();
                 }
@@ -2494,30 +2092,6 @@ namespace TalentClassLibrary
         }
 
         /// <summary>
-        /// 刪除指定面談資料的附加檔案
-        /// </summary>
-        /// <param name="interviewId"></param>
-        /// <returns></returns>
-        public string DelFilesByInterviewId(string interviewId)
-        {
-            string serverDir = @".\files\" + interviewId;
-            try
-            {
-                if (Directory.Exists(serverDir))
-                {
-                    Directory.Delete(serverDir, true);
-                }
-
-                return "附加檔案刪除成功";
-            }
-            catch (Exception ex)
-            {
-                LogInfo.WriteErrorInfo(ex);
-                return "附加檔案刪除失敗";
-            }
-        }
-
-        /// <summary>
         /// 刪除圖片檔 by面談ID
         /// </summary>
         /// <param name="path"></param>
@@ -2555,47 +2129,7 @@ namespace TalentClassLibrary
             }
         }
 
-        /// <summary>
-        /// 根據情況處理圖片檔案
-        /// </summary>
-        /// <param name="dbPath"></param>
-        /// <param name="uiPath"></param>
-        /// <param name="interviewId"></param>
-        public string UpdateImage(string dbPath, string uiPath, string interviewId)
-        {
-            ////DB跟UI都沒有圖片則不做事
-            if (string.IsNullOrEmpty(dbPath) && string.IsNullOrEmpty(uiPath))
-            {
-                return string.Empty;
-            }
-
-            ////如果照片沒有換
-            if (dbPath.Equals(uiPath))
-            {
-                return dbPath;
-            }
-
-            ////DB有圖片，UI沒圖片則砍掉圖片檔案
-            if (!string.IsNullOrEmpty(dbPath) && string.IsNullOrEmpty(uiPath))
-            {
-                try
-                {
-                    if (File.Exists(dbPath))
-                    {
-                        File.Delete(dbPath);
-                    }
-
-                    return uiPath;
-                }
-                catch (IOException ex)
-                {
-                    LogInfo.WriteErrorInfo(ex);
-                    return "檔案刪除失敗";
-                }
-            }
-
-            return this.UpLoadImage(uiPath, interviewId);
-        }
+        
 
         /// <summary>
         /// 修改面試基本資料
@@ -2610,7 +2144,7 @@ namespace TalentClassLibrary
                 return "修改失敗";
             }
 
-            string path = this.UpdateImage(dbPath, uiPath, interviewId);
+            string path = TalentFiles.GetInstance().UpdateImage(dbPath, uiPath, interviewId);
             if (path.Equals("上傳失敗") || path.Equals("不存在的路徑") || path.Equals("檔案刪除失敗"))
             {
                 throw new Exception();
@@ -2745,7 +2279,7 @@ namespace TalentClassLibrary
                 return "密碼錯誤";
             }
 
-            string msg = this.ValidNewPassword(newPassword, checkNewPassword);
+            string msg = TalentValid.GetInstance().ValidNewPassword(newPassword, checkNewPassword);
             if (!msg.Equals(string.Empty))
             {
                 return msg;
@@ -2774,37 +2308,6 @@ namespace TalentClassLibrary
             {
                 this.CloseDatabaseConnection();
             }
-        }
-
-        /// <summary>
-        /// 驗證聯繫狀況資料的正確性
-        /// </summary>
-        /// <param name="validData">聯繫狀況資料</param>
-        /// <returns>空值代表沒有錯誤</returns>
-        public string ValidContactSituationData(DataTable validData)
-        {
-            string msg = string.Empty;
-            foreach (DataRow dr in validData.Rows)
-            {
-                msg = Valid.GetInstance().ValidDateFormat(dr["Contact_Date"].ToString().Trim());
-                if (!msg.Equals(string.Empty))
-                {
-                    return msg;
-                }
-
-                msg = this.ValidContactStatus(dr["Contact_Status"].ToString().Trim());
-                if (!msg.Equals(string.Empty))
-                {
-                    return msg;
-                }
-
-                /*if (!this.ValidIdIsAppear(dr["Contact_Id"].ToString()))
-                {
-                    msg = "聯繫狀況資料不存在";
-                }*/
-            }
-
-            return msg;
         }
 
         /// <summary>
@@ -2889,67 +2392,6 @@ namespace TalentClassLibrary
             {
                 this.CloseDatabaseConnection();
             }
-        }
-
-        /// <summary>
-        /// 驗證聯繫狀況基本資料是否正確
-        /// </summary>
-        /// <param name="name">姓名不可為空</param>
-        /// <param name="code">可以有多個代碼，代碼都是唯一值</param>
-        /// <param name="sex">值為"男"or"女"</param>
-        /// <param name="mail">e-mail格式</param>
-        /// <param name="cellPhone">手機格式</param>
-        /// <param name="place"><地點</param>
-        /// <param name="skill">技能</param>
-        /// <param name="cooperationMode">合作模式值為"全職"or"合約"or"皆可"</param>
-        /// <param name="states">狀態值為"追蹤"or"保留"</param>
-        /// <returns>空值代表沒有錯誤</returns>
-        public string ValidContactSituationInfoData(string name, DataTable code, string sex, string mail, string cellPhone, string place, string skill, string cooperationMode, string states)
-        {
-            string msg = string.Empty;
-            string validMsg = string.Empty;
-            if (string.IsNullOrEmpty(name) && code.Rows.Count == 0)
-            {
-                msg += "姓名或代碼請至少填一個\n";
-            }
-
-            validMsg = Valid.GetInstance().ValidSex(sex);
-            if (!validMsg.Equals(string.Empty))
-            {
-                msg += validMsg + "\n";
-            }
-
-            validMsg = Valid.GetInstance().ValidMailFormat(mail);
-            if (!validMsg.Equals(string.Empty))
-            {
-                msg += validMsg + "\n";
-            }
-
-            validMsg = Valid.GetInstance().ValidCellPhoneFormat(cellPhone);
-            if (!validMsg.Equals(string.Empty))
-            {
-                msg += validMsg + "\n";
-            }
-
-            validMsg = this.ValidCooperationMode(cooperationMode);
-            if (!validMsg.Equals(string.Empty))
-            {
-                msg += validMsg + "\n";
-            }
-
-            validMsg = this.ValidStates(states);
-            if (!validMsg.Equals(string.Empty))
-            {
-                msg += validMsg + "\n";
-            }
-
-            validMsg = this.ValidCodeIsRepeat(code);
-            if (!validMsg.Equals(string.Empty))
-            {
-                msg += validMsg;
-            }
-
-            return msg;
         }
 
         /// <summary>
@@ -3057,47 +2499,6 @@ namespace TalentClassLibrary
         }
 
         /// <summary>
-        /// 驗證此聯繫狀況是否存在
-        /// </summary>
-        /// <param name="contactStatus">聯繫狀況</param>
-        /// <returns>空值代表沒有錯誤，錯誤會回傳"沒有此聯繫狀況"</returns>
-        public string ValidContactStatus(string contactStatus)
-        {
-            string msg = string.Empty;
-
-
-            if (string.IsNullOrEmpty(contactStatus))
-            {
-                return msg;
-            }
-
-            Models Contact_Status = new Models();
-            List<string> Contact_Statuslist = Contact_Status.Contact_Status;
-            if (!Contact_Statuslist.Contains(contactStatus))
-            {
-                msg = "沒有\"" + contactStatus + "\"此聯繫狀況";
-            }
-
-            return msg;
-        }
-
-        /// <summary>
-        /// 驗證合作模式的值，值為"全職"or"合約"or"皆可"
-        /// </summary>
-        /// <param name="cooperationMode">驗證模式的值</param>
-        /// <returns>空值代表沒有錯誤</returns>
-        public string ValidCooperationMode(string cooperationMode)
-        {
-            string msg = string.Empty;
-            if ((cooperationMode != "全職" && cooperationMode != "合約" && cooperationMode != "皆可") || string.IsNullOrEmpty(cooperationMode))
-            {
-                msg = "合作狀態須為\"全職\"or\"合約\"or\"皆可\"";
-            }
-
-            return msg;
-        }
-
-        /// <summary>
         /// 驗證欲新增的帳號是否已存在
         /// </summary>
         /// <param name="account">欲新增的帳號</param>
@@ -3110,8 +2511,8 @@ namespace TalentClassLibrary
             }
 
             int count = 0;
-            account = AddMailFormat(account);
-            string msg = this.ValidIsCompanyMail(account);
+            account = TalentCommon.GetInstance().AddMailFormat(account);
+            string msg = TalentValid.GetInstance().ValidIsCompanyMail(account);
             if (!msg.Equals(string.Empty))
             {
                 return msg;
@@ -3153,109 +2554,6 @@ namespace TalentClassLibrary
         }
 
         /// <summary>
-        /// 驗證帳號的狀態
-        /// </summary>
-        /// <param name="states">傳入該帳號的狀態</param>
-        /// <returns>啟用回傳true，停用回傳false</returns>
-        public bool ValidMemberStates(string states)
-        {
-            if (states.Equals("啟用"))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// 確認輸入的兩次新密碼是否相同
-        /// </summary>
-        /// <param name="newPassword">新密碼</param>
-        /// <param name="checkNewPassword">確認新密碼</param>
-        /// <returns>空值代表密碼一致</returns>
-        public string ValidNewPassword(string newPassword, string checkNewPassword)
-        {
-            string msg = string.Empty;
-            if (!newPassword.Equals(checkNewPassword))
-            {
-                msg = "新密碼不一致";
-            }
-
-            return msg;
-        }
-
-        /// <summary>
-        /// 驗證專案經驗是否為空值
-        /// </summary>
-        /// <param name="projectExperienceList"></param>
-        /// <returns></returns>
-        public string ValidProjectExperienceData(List<ProjectExperience> projectExperienceList)
-        {
-            string msg = string.Empty;
-            foreach (ProjectExperience projectExperience in projectExperienceList)
-            {
-                if (projectExperience.Company == string.Empty && projectExperience.Project_Name == string.Empty
-                    && projectExperience.OS == string.Empty && projectExperience.Database == string.Empty
-                    && projectExperience.Description == string.Empty && projectExperience.Position == string.Empty
-                    && projectExperience.Start_End_Date == string.Empty && projectExperience.Language == string.Empty
-                    && projectExperience.Tools == string.Empty)
-                {
-                    msg = "有空的專案經驗";
-                }
-            }
-
-            return msg;
-        }
-
-        /// <summary>
-        /// 驗證專案經驗是否重複
-        /// </summary>
-        /// <param name="data">將多個專案經驗包成DataTable</param>
-        /// <returns>空值代表沒有錯誤</returns>
-        public string ValidProjectExperienceIsRepeat(System.Data.DataTable data)
-        {
-            string msg = string.Empty;
-            var repeat = (from row in data.AsEnumerable()
-                          group row by new
-                          {
-                              //Interview_Id = row.Field<string>("Interview_Id"),
-                              Company = row.Field<string>("Company"),
-                              Project_Name = row.Field<string>("Project_Name")
-                          } into g
-                          where g.Count() > 1
-                          select g.Key).ToList();
-            if (repeat.Count > 0)
-            {
-                msg = "專案資料重複";
-            }
-
-            return msg;
-        }
-
-        /// <summary>
-        /// 驗證聯繫狀況資料的狀態的值是否為"追蹤"or"保留"
-        /// </summary>
-        /// <param name="states">狀態</param>
-        /// <returns>空代表沒有錯誤</returns>
-        public string ValidStates(string states)
-        {
-            string msg = string.Empty;
-            if (string.IsNullOrEmpty(states))
-            {
-                return msg;
-            }
-
-            if ((states != "追蹤" && states != "儲存") || string.IsNullOrEmpty(states))
-            {
-                msg = "合作狀態須為\"追蹤\"or\"儲存\"";
-            }
-
-            return msg;
-        }
-
-        /// <summary>
         /// 刪除指定帳號
         /// </summary>
         /// <param name="account">欲刪除的帳號</param>
@@ -3283,63 +2581,6 @@ namespace TalentClassLibrary
             {
                 this.CloseDatabaseConnection();
             }
-        }
-
-        /// <summary>
-        /// 驗證面試基本資料是否正確
-        /// </summary>
-        /// <param name="vacancies">應徵職缺不可為空值</param>
-        /// <param name="name">姓名不可為空值</param>
-        /// <param name="married">值為"已婚"or"未婚"</param>
-        /// <param name="interviewDate">面試日期不可為空值</param>
-        /// <param name="sex">值為"男"or"女"</param>
-        /// <param name="mail">值為e-mail格式</param>
-        /// <param name="birthday">生日</param>
-        /// <param name="cellPhone">值為手機格式</param>
-        /// <param name="picture">值為照片路徑</param>
-        /// <returns>空值代表沒有錯誤</returns>
-        public string ValidInterviewInfoData(string vacancies, string name, string married, string interviewDate, string sex, string mail, string birthday, string cellPhone, string picture)
-        {
-            string msg = string.Empty;
-            string validMsg = string.Empty;
-            if (string.IsNullOrEmpty(vacancies))
-            {
-                msg += "應徵職缺不可為空值\n";
-            }
-
-            if (string.IsNullOrEmpty(name))
-            {
-                msg += "姓名不可為空值\n";
-            }
-
-            validMsg = Valid.GetInstance().ValidMarried(married);
-            if (validMsg != string.Empty)
-            {
-                msg += validMsg + "\n";
-            }
-
-            validMsg = Valid.GetInstance().ValidDateFormat(interviewDate);
-            if (validMsg != string.Empty)
-            {
-                msg += "面談日期為空值or格式不正確\n";
-            }
-
-            validMsg = Valid.GetInstance().ValidSex(sex);
-            if (validMsg != string.Empty)
-            {
-                msg += validMsg + "\n";
-            }
-
-            if (!string.IsNullOrEmpty(string.Empty))
-            {
-                validMsg = Valid.GetInstance().ValidDateFormat(birthday);
-                if (validMsg != string.Empty)
-                {
-                    msg += "生日為格式不正確\n";
-                }
-            }
-
-            return msg;
         }
 
         /// <summary>
@@ -3377,39 +2618,6 @@ namespace TalentClassLibrary
                 {
                     SetControls(newx, newy, con);
                 }
-            }
-        }
-
-        /// <summary>
-        /// 如果帳號沒有Mail格式則幫其補上
-        /// </summary>
-        /// <param name="account">帳號</param>
-        /// <returns>Mail格式的帳號</returns>
-        private static string AddMailFormat(string account)
-        {
-            account = (account.Contains("@")) ? account : account + "@is-land.com.tw";
-            return account;
-        }
-
-        /// <summary>
-        /// 如果值為"不限"，NULL，空，則回傳DBNULL
-        /// </summary>
-        /// <param name="value">要判斷的值</param>
-        /// <returns>會傳值或者是DBNULL</returns>
-        private object ValueIsAny(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return DBNull.Value;
-            }
-            else
-            {
-                if (value.Equals("不限"))
-                {
-                    return DBNull.Value;
-                }
-
-                return value;
             }
         }
     }
